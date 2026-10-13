@@ -1,0 +1,19 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.4.6">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>62471e32-e01b-4b4a-87cb-22267f7fbdd5</UserSecretsId>
+    <!-- Aspire SDK 自带包版本；避免与仓库 CPM 冲突 -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <Description>XW Aspire AppHost — 统一本地开发：Agent + Host + Dashboard Trace</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\XW.Host.API\XW.Host.API.csproj" />
+    <ProjectReference Include="..\..\Services\XW.Agent.Host\XW.Agent.Host.csproj" />
+  </ItemGroup>
+
+</Project>

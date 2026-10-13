@@ -1,0 +1,34 @@
+# 仅主站 Host（Integration / Brain 暂不纳入）
+# 用法：
+#   1. cp .env.example .env  并改成测试机真实连接串
+#   2. docker compose up -d --build
+#
+# MySQL / Redis / RabbitMQ 默认连宿主机（需已在宿主机或其它 compose 中运行）
+
+services:
+  host-api:
+    image: xw-host-api:local
+    build:
+      context: .
+      dockerfile: src/XW.Host.API/Dockerfile
+    container_name: xw-host-api
+    ports:
+      - "${HOST_API_PORT:-8080}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://+:8080
+      # 与 appsettings.json 节名对应（__ = 嵌套）
+      Mysql__ConnectionString: ${MYSQL_CONNECTION}
+      Mysql__ServerVersion: ${MYSQL_SERVER_VERSION:-5.7.44}
+      Mysql__ServerType: MySql
+      SysLogDb__DbType: mysql
+      SysLogDb__ConnectionString: ${SYSLOG_MYSQL_CONNECTION}
+      Redis__Dbconfig__ConnectionString: ${REDIS_CONNECTION}
+      RabbitMq__HostName: ${RABBITMQ_HOST}
+      RabbitMq__Port: ${RABBITMQ_PORT:-5672}
+      RabbitMq__VirtualHost: ${RABBITMQ_VHOST:-/}
+      RabbitMq__UserName: ${RABBITMQ_USER:-guest}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-guest}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

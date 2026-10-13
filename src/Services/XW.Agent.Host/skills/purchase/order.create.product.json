@@ -1,0 +1,37 @@
+{
+  "Code": "purchase.order.create.product",
+  "Name": "创建成品/半成品采购单(草稿)",
+  "Domain": "purchase",
+  "WhenToUse": "用户确认要创建成品或半成品采购单；参数齐全且已选定供应商。",
+  "Tags": [ "采购单", "成品", "写入" ],
+  "Aliases": [ "建成品采购单", "采购成品", "采购半成品" ],
+  "RelatedCodes": [ "products.search", "suppliers.search", "purchase.price.compare" ],
+  "Risk": "write",
+  "Description": "创建草稿成品/半成品采购单（单行）。",
+  "Permissions": [ "agent.purchase.write" ],
+  "IntentCode": "purchase.order.create.product",
+  "Enabled": true,
+  "ConfirmRequired": true,
+  "OutputHints": [
+    { "Name": "orderNo", "Description": "采购单号" },
+    { "Name": "id", "Description": "采购单主键" }
+  ],
+  "Parameters": [
+    { "Name": "supplierId", "Required": true, "Type": "string" },
+    { "Name": "productId", "Required": true, "Type": "string" },
+    { "Name": "qty", "Required": true, "Type": "string" },
+    { "Name": "uomId", "Required": true, "Type": "string" },
+    { "Name": "unitPrice", "Required": true, "Type": "string" },
+    { "Name": "remark", "Required": false, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "POST",
+    "Path": "/api/console/supply-chain/PurchaseOrders/products",
+    "BodyTemplate": "{\"idempotencyKey\":\"{{idempotencyKey}}\",\"supplierId\":{{supplierId}},\"remark\":\"{{remark}}\",\"lines\":[{\"idempotencyKey\":\"{{lineIdempotencyKey}}\",\"productId\":{{productId}},\"qty\":{{qty}},\"uomId\":{{uomId}},\"unitPrice\":{{unitPrice}}}]}",
+    "TimeoutSeconds": 30,
+    "MaxRetries": 0,
+    "FallbackToStub": false
+  }
+}

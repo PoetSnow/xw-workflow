@@ -1,0 +1,33 @@
+{
+  "Code": "purchase.price.compare",
+  "Name": "供应商采购价比对",
+  "Domain": "purchase",
+  "WhenToUse": "对某物料/成品做供应商历史采购价比对，或创建采购单前先看价。",
+  "Tags": [ "比价", "采购价", "供应商" ],
+  "Aliases": [ "比价", "对比采购价", "哪家便宜" ],
+  "RelatedCodes": [ "products.search", "materials.search", "suppliers.search", "purchase.order.create.material", "purchase.order.create.product" ],
+  "Risk": "read",
+  "Description": "按 materialId 或 productId 查询各供应商历史采购价。",
+  "Permissions": [ "agent.purchase.read" ],
+  "IntentCode": "purchase.price.compare",
+  "Enabled": true,
+  "Parameters": [
+    { "Name": "materialId", "Description": "物料主键（与 productId 二选一）", "Required": false, "Type": "string" },
+    { "Name": "productId", "Description": "产品主键（与 materialId 二选一）", "Required": false, "Type": "string" },
+    { "Name": "top", "Description": "历史行数上限，默认 30", "Required": false, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "GET",
+    "Path": "/api/console/supply-chain/PurchaseOrders/price-compare",
+    "Query": {
+      "materialId": "{{materialId}}",
+      "productId": "{{productId}}",
+      "top": "{{top}}"
+    },
+    "TimeoutSeconds": 20,
+    "MaxRetries": 1,
+    "FallbackToStub": false
+  }
+}

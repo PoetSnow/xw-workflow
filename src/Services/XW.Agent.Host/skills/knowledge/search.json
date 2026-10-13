@@ -1,0 +1,17 @@
+{
+  "Code": "knowledge.search",
+  "Name": "知识库检索",
+  "Domain": "knowledge",
+  "WhenToUse": "从企业知识库检索与用户问题相关的文档片段。不查询库存数字、不创建单据。",
+  "Tags": [ "知识库", "政策", "FAQ", "售后" ],
+  "Aliases": [ "查知识", "搜文档", "查政策", "查手册" ],
+  "Risk": "read",
+  "Description": "从 PostgreSQL 知识库检索文档片段。知识检索只需这一条 Skill。",
+  "Permissions": [ "agent.knowledge.read" ],
+  "IntentCode": "search_knowledge",
+  "Enabled": true,
+  "Parameters": [
+    { "Name": "query", "Type": "string", "Required": true, "Description": "检索问句" },
+    { "Name": "domain", "Type": "string", "Required": false, "Description": "可选库内过滤" }
+  ]
+}

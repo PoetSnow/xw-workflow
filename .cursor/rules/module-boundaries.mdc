@@ -1,0 +1,37 @@
+---
+description: NX-AIHealth-Services 模块结构、Swagger 注释、业务边界。新增能力、控制器、DTO、跨模块调用时必须遵守。
+alwaysApply: true
+---
+
+# 模块结构、注释、边界
+
+## 结构
+
+新能力是独立模块，磁盘在 `src/Modules/XW.{Name}/`，解决方案挂在 **Modules / XW.{Name}** 下，与 Customer、Sales、Cooking 同级。不要挂到 `src` 解决方案文件夹，也不要写进别的模块。
+
+每个模块按需包含：`Application.Contracts`、`Application`、`API`、`Repository` 或 `Infrastructure`。跨模块只引用对方的 `*.Application.Contracts`。注册进 `ModuleCatalog` 和 `XW.Host.API.csproj`。
+
+新表只提交 `docs/sql/` 脚本，由人手工执行。代码里不要 `INSERT` / `CREATE TABLE` / `ALTER`。
+
+## 注释
+
+新增的控制器、Action、服务接口方法、DTO 及其属性写 `/// <summary>`，Swagger 靠这些说明。
+
+```csharp
+/// <summary>当前端已启用的支付方式。</summary>
+Task<IReadOnlyList<PaymentMethodDto>> ListMethodsAsync(string surface, CancellationToken cancellationToken = default);
+```
+
+## 边界
+
+协议、签名、配置、回调留在拥有该能力的模块里。调用方只调契约，不实现对方的协议。
+
+- 支付：对外 `IPaymentService`。渠道实现 `IPaymentProvider`。每种支付一个回调地址。订单只做入账，不写微信或支付宝协议。
+- 烹饪只调用 `IPotService` 写 Outbox，不引用 MQTT 客户端。
+- Devices 不改客户表。权益属于 Customer。实物单只有 `mall_order`。
+- Portal 只编排：校验归属后调用其他模块契约。
+
+```csharp
+// 订单服务里直接验签、解密、读商户私钥
+// 订单服务调用 IPaymentService.PrepayAsync，入账用渠道无关的方法
+```

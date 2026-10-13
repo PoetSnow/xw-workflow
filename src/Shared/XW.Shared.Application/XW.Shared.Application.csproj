@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Registrar\AbstractApplicationDependencyRegistrar.RpcClient.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Microsoft.Extensions.Http.Polly" />
+	  <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+	  <PackageReference Include="DotNetCore.CAP.RabbitMQ" />
+	  <PackageReference Include="EFCore.NamingConventions" />
+	  <PackageReference Include="AutoMapper" />
+	  <PackageReference Include="FluentValidation" />
+	  <PackageReference Include="Refit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructures\XW.Infra.EventBus\XW.Infra.EventBus.csproj" />
+    <ProjectReference Include="..\..\Infrastructures\XW.Infra.IdGenerater\XW.Infra.IdGenerater.csproj" />
+    <ProjectReference Include="..\..\Infrastructures\XW.Infra.Redis.Caching\XW.Infra.Redis.Caching.csproj" />
+    <ProjectReference Include="..\..\Infrastructures\XW.Infra.Repository.Dapper\XW.Infra.Repository.Dapper.csproj" />
+    <ProjectReference Include="..\..\Infrastructures\XW.Infra.Repository.EfCore.MySql\XW.Infra.Repository.EfCore.MySql.csproj" />
+    <ProjectReference Include="..\XW.Shared.Application.Contracts\XW.Shared.Application.Contracts.csproj" />
+    <ProjectReference Include="..\XW.Shared.Remote\XW.Shared.Remote.csproj" />
+    <ProjectReference Include="..\XW.Shared.Repository\XW.Shared.Repository.csproj" />
+    <ProjectReference Include="..\XW.Shared\XW.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

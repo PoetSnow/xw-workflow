@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
+    <Description>XW monolith API host</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Update="swagger_miniprofiler.html" CopyToOutputDirectory="PreserveNewest" />
+    <Content Update="NLog\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\XW.Shared.WebApi\XW.Shared.WebApi.csproj" />
+    <ProjectReference Include="..\Modules\XW.System\XW.System.Application\XW.System.Application.csproj" />
+    <ProjectReference Include="..\Modules\XW.System\XW.System.API\XW.System.API.csproj" />
+    <ProjectReference Include="..\Modules\XW.Approve\XW.Approve.Infrastructure\XW.Approve.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\XW.Approve\XW.Approve.Application\XW.Approve.Application.csproj" />
+    <ProjectReference Include="..\Modules\XW.Approve\XW.Approve.API\XW.Approve.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="swagger_miniprofiler.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

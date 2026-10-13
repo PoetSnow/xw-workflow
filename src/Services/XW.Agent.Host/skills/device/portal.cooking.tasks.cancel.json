@@ -1,0 +1,28 @@
+{
+  "Code": "portal.cooking.tasks.cancel",
+  "Name": "取消我的制作",
+  "Domain": "device",
+  "WhenToUse": "小程序会员确认要取消自己的某个制作任务。",
+  "Tags": [ "小程序", "制作", "取消", "写入" ],
+  "Aliases": [ "取消我的制作", "停止我的煮茶" ],
+  "RelatedCodes": [ "portal.cooking.tasks.get" ],
+  "Surface": "portal",
+  "Risk": "write",
+  "Description": "调用小程序取消接口。必须先确认。Host 只取消当前会员自己的任务。",
+  "Permissions": [],
+  "IntentCode": "portal.cooking.tasks.cancel",
+  "Enabled": true,
+  "ConfirmRequired": true,
+  "Parameters": [
+    { "Name": "id", "Description": "自己的制作任务 Id", "Required": true, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "POST",
+    "Path": "/api/portal/cooking/tasks/{{id}}/cancel",
+    "TimeoutSeconds": 30,
+    "MaxRetries": 0,
+    "FallbackToStub": false
+  }
+}

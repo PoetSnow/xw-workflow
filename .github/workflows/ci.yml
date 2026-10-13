@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (build + test)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      # 跨模块禁止引用对方 Domain（仅 Contracts / 同模块 Domain / Shared.Domain）
+      - name: Architecture gate (no cross-module Domain refs)
+        run: bash scripts/ci/check-module-boundaries.sh
+
+      - name: Restore
+        run: dotnet restore XW.sln
+
+      - name: Build
+        run: dotnet build XW.sln --configuration Release --no-restore
+
+      # PulsePpg 依赖 Windows Debug 原生 DLL，Linux CI 排除该项目用例
+      - name: Test
+        run: >
+          dotnet test XW.sln
+          --configuration Release
+          --no-build
+          --verbosity normal
+          --filter "FullyQualifiedName!~XW.Integration.PulsePpg"

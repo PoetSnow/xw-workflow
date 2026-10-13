@@ -1,0 +1,33 @@
+# k3s 默认带 Traefik Ingress Controller
+#
+# 无域名时：把 spec.rules[].host 改成你的服务器 IP，或删掉 host 仅用 path
+# 本地验证：curl -H "Host: xw.local" http://SERVER_IP/swagger/index.html
+#
+# TLS（可选）：配置 cert-manager 或 Traefik 自签证书后取消 tls 注释
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: xw-host-api
+  namespace: xw
+  labels:
+    app.kubernetes.io/name: xw-host-api
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: xw.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: xw-host-api
+                port:
+                  number: 80
+  # tls:
+  #   - hosts:
+  #       - xw.local
+  #     secretName: xw-host-api-tls

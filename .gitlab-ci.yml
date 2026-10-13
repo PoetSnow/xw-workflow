@@ -1,0 +1,123 @@
+# GitLab CI/CD（内网 GitLab + 测试机 192.168.1.150）
+#
+# 推荐架构：在 150 上注册 GitLab Runner（shell 执行器，tag: xw-150）
+# 这样 CI/CD 都在局域网完成，无需公网。
+#
+# 150 一次性准备：
+#   1) 安装 Runner 并注册到内网 GitLab（executor=shell，tag=xw-150）
+#   2) 安装：dotnet-sdk-8.0、docker / docker-compose
+#   3) 持久配置：mkdir -p /opt/xw && 把 .env 放到 /opt/xw/.env（勿提交仓库）
+#   4) GitLab 项目 → Settings → CI/CD → Variables（可选）：无特殊要求时可先空着
+#   5) 保护分支 main/master；Deploy 的 production job 为手动（when: manual）
+#
+# 流程：
+#   push / MR → gate + test
+#   合入 main/master → 自动 deploy_test（150 上 docker-compose up --build）
+#   点「播放」按钮 → deploy_prod（学习阶段可先跳过或指向另一台机器）
+
+stages:
+  - gate
+  - test
+  - deploy
+
+default:
+  tags:
+    - xw-150
+  interruptible: true
+
+variables:
+  # 服务器上存放 .env 的目录（连接串等）
+  ENV_FILE: "/opt/xw/.env"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "true"
+
+# ---------- CI ----------
+
+architecture_gate:
+  stage: gate
+  script:
+    - bash scripts/ci/check-module-boundaries.sh
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+backend_test:
+  stage: test
+  script:
+    - dotnet --info
+    - dotnet restore XW.sln
+    - dotnet build XW.sln --configuration Release --no-restore
+    - >
+      dotnet test XW.sln
+      --configuration Release
+      --no-build
+      --verbosity normal
+      --filter "FullyQualifiedName!~XW.Integration.PulsePpg"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# ---------- CD：测试环境（合 main/master 自动） ----------
+
+deploy_test:
+  stage: deploy
+  environment:
+    name: test
+    url: http://192.168.1.150:8080
+  resource_group: xw-150-host
+  script:
+    - |
+      set -e
+      echo "Deploy test from $CI_COMMIT_SHORT_SHA"
+      if [ ! -f "$ENV_FILE" ]; then
+        echo "ERROR: missing $ENV_FILE — create it on 150 from .env.example"
+        exit 1
+      fi
+      cp "$ENV_FILE" .env
+      # 你的机器是 docker-compose（带横杠）
+      if command -v docker-compose >/dev/null 2>&1; then
+        COMPOSE="docker-compose"
+      else
+        COMPOSE="docker compose"
+      fi
+      $COMPOSE up -d --build
+      $COMPOSE ps
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"
+  needs:
+    - architecture_gate
+    - backend_test
+
+# ---------- CD：生产（人工点确认才跑） ----------
+
+deploy_prod:
+  stage: deploy
+  environment:
+    name: production
+  resource_group: xw-prod-host
+  when: manual
+  allow_failure: false
+  script:
+    - |
+      set -e
+      echo "Manual prod deploy: $CI_COMMIT_SHORT_SHA"
+      # 学习阶段：若生产也是 150，可与 test 相同；有独立机器时改 PROD_ENV_FILE / 目录
+      PROD_ENV="${PROD_ENV_FILE:-/opt/xw-prod/.env}"
+      if [ ! -f "$PROD_ENV" ]; then
+        echo "SKIP/ERROR: $PROD_ENV not found."
+        echo "Create prod .env or set CI variable PROD_ENV_FILE. For learning, you can pause here."
+        exit 1
+      fi
+      cp "$PROD_ENV" .env
+      if command -v docker-compose >/dev/null 2>&1; then
+        COMPOSE="docker-compose"
+      else
+        COMPOSE="docker compose"
+      fi
+      $COMPOSE up -d --build
+      $COMPOSE ps
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"
+      when: manual
+  needs:
+    - deploy_test

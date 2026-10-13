@@ -1,0 +1,33 @@
+{
+  "Code": "device.pots.get",
+  "Name": "查询单个壶",
+  "Domain": "device",
+  "WhenToUse": "运营后台给出壶 Id，要查看在线状态、工作状态和当前任务。只读。",
+  "Tags": [ "设备", "壶", "只读" ],
+  "Aliases": [ "壶状态", "设备在线吗", "壶详情" ],
+  "RelatedCodes": [ "device.pots.list", "device.cooking.tasks.get" ],
+  "Surface": "console",
+  "Risk": "read",
+  "Description": "运营后台按壶 Id 查看详情。权限 pot-cooking。不引用 MQTT，不等待 ACK。",
+  "Permissions": [ "pot-cooking" ],
+  "IntentCode": "device.pots.get",
+  "Enabled": true,
+  "ConfirmRequired": false,
+  "OutputHints": [
+    { "Name": "online", "Description": "是否在线" },
+    { "Name": "workState", "Description": "工作状态" },
+    { "Name": "currentTaskId", "Description": "当前制作任务 Id" }
+  ],
+  "Parameters": [
+    { "Name": "id", "Description": "壶 Id", "Required": true, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "GET",
+    "Path": "/api/console/pots/{{id}}",
+    "TimeoutSeconds": 20,
+    "MaxRetries": 1,
+    "FallbackToStub": false
+  }
+}

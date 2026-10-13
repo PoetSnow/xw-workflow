@@ -1,0 +1,45 @@
+# 示例：演示机 Nginx（同域反代 Console + Host + Agent）
+# 配合 docs/agent-demo-public.md
+#
+# Console: pnpm build 后把 dist 放到 root
+# Host:    本机 8080（docker）或 5295（dotnet run）
+# Agent:   本机 5002
+
+server {
+    listen 80;
+    server_name demo.example.com;
+    # 生产请上 443 + ssl_certificate
+
+    root /var/www/xw-console;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 与 client Vite 开发代理语义对齐：/api → Host /api/console
+    location /api/ {
+        proxy_pass http://127.0.0.1:8080/api/console/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Authorization $http_authorization;
+        proxy_read_timeout 120s;
+        client_max_body_size 32m;
+    }
+
+    # /agent-api/... → Agent Host ...
+    location /agent-api/ {
+        proxy_pass http://127.0.0.1:5002/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Authorization $http_authorization;
+        proxy_read_timeout 180s;
+        client_max_body_size 52m;
+    }
+}

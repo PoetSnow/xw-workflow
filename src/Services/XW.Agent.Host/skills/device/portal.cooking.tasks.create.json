@@ -1,0 +1,34 @@
+{
+  "Code": "portal.cooking.tasks.create",
+  "Name": "启动我的制作",
+  "Domain": "device",
+  "WhenToUse": "小程序会员确认要在自己的壶上按配方启动制作。",
+  "Tags": [ "小程序", "制作", "启动", "写入" ],
+  "Aliases": [ "开始煮茶", "启动制作", "开始制作" ],
+  "RelatedCodes": [ "portal.cooking.tasks.get" ],
+  "Surface": "portal",
+  "Risk": "write",
+  "Description": "调用小程序启动制作接口。必须先确认。Host 只给当前会员创建，不直发 MQTT，也不等待 ACK。",
+  "Permissions": [],
+  "IntentCode": "portal.cooking.tasks.create",
+  "Enabled": true,
+  "ConfirmRequired": true,
+  "OutputHints": [
+    { "Name": "id", "Description": "新任务 Id" },
+    { "Name": "status", "Description": "任务状态" }
+  ],
+  "Parameters": [
+    { "Name": "deviceId", "Description": "自己的壶 Id", "Required": true, "Type": "string" },
+    { "Name": "recipeCode", "Description": "已发布配方编码", "Required": true, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "POST",
+    "Path": "/api/portal/cooking/tasks",
+    "BodyTemplate": "{\"deviceId\":{{deviceId}},\"recipeCode\":\"{{recipeCode}}\"}",
+    "TimeoutSeconds": 30,
+    "MaxRetries": 0,
+    "FallbackToStub": false
+  }
+}

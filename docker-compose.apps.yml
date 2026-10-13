@@ -1,0 +1,86 @@
+# =============================================================================
+# 应用栈：Host + Agent（Console 已拆到 NX-AIHealth-Platform，本仓不再构建）
+# 中间件（MySQL / Redis / RabbitMQ）已用 Docker 单独跑 → 本文件不再起中间件
+#
+# 用法（仓库根目录）：
+#   1. cp .env.apps.example .env.apps   # 改密码与 LLM 地址
+#   2. docker compose -f docker-compose.apps.yml --env-file .env.apps up -d --build
+#   3. Host http://服务器IP:8080 ；管理端在独立仓部署
+#
+# 连已有中间件：默认用 host.docker.internal 访问宿主机已映射的 3306/6379/5672
+# =============================================================================
+
+services:
+  host-api:
+    image: xw-host-api:local
+    build:
+      context: .
+      dockerfile: src/XW.Host.API/Dockerfile
+    container_name: xw-host-api
+    ports:
+      - "${HOST_API_PORT:-8080}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://+:8080
+      Mysql__ConnectionString: ${MYSQL_CONNECTION}
+      Mysql__ServerVersion: ${MYSQL_SERVER_VERSION:-5.7.44}
+      Mysql__ServerType: MySql
+      SysLogDb__DbType: mysql
+      SysLogDb__ConnectionString: ${SYSLOG_MYSQL_CONNECTION}
+      Redis__Dbconfig__ConnectionString: ${REDIS_CONNECTION}
+      RabbitMq__HostName: ${RABBITMQ_HOST}
+      RabbitMq__Port: ${RABBITMQ_PORT:-5672}
+      RabbitMq__VirtualHost: ${RABBITMQ_VHOST:-/}
+      RabbitMq__UserName: ${RABBITMQ_USER:-guest}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-guest}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - xw-apps
+    restart: unless-stopped
+
+  agent:
+    image: xw-agent:local
+    build:
+      context: .
+      dockerfile: src/Services/XW.Agent.Host/Dockerfile
+    container_name: xw-agent
+    ports:
+      - "${AGENT_PORT:-5002}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://+:8080
+      Agent__HostApi__BaseUrl: http://host-api:8080
+      Agent__EnableStubTools: ${AGENT_ENABLE_STUB:-false}
+      # 演示：先放开 Agent 能力权限；业务仍靠请求里 AccessToken 打 Host
+      Agent__Policy__Bypass: ${AGENT_POLICY_BYPASS:-true}
+      Agent__Knowledge__ConnectionString: ${AGENT_PG_CONNECTION:-}
+      Agent__Knowledge__Enabled: ${AGENT_KNOWLEDGE_ENABLED:-false}
+      # Embedding 可走线上 OpenAI 兼容 API（生产 GPU 只跑对话模型时推荐）
+      Agent__Knowledge__Embedding__Enabled: ${AGENT_EMBEDDING_ENABLED:-false}
+      Agent__Knowledge__Embedding__Endpoint: ${AGENT_EMBEDDING_ENDPOINT:-}
+      Agent__Knowledge__Embedding__ApiKey: ${AGENT_EMBEDDING_API_KEY:-}
+      Agent__Knowledge__Embedding__ModelName: ${AGENT_EMBEDDING_MODEL:-BAAI/bge-m3}
+      Agent__Knowledge__Embedding__Dimensions: ${AGENT_EMBEDDING_DIMENSIONS:-1024}
+      Agent__Knowledge__Embedding__EmbeddingsPath: ${AGENT_EMBEDDING_PATH:-/v1/embeddings}
+      Agent__Llm__Enabled: "true"
+      Agent__Llm__ActiveProfile: ${AGENT_LLM_PROFILE:-local}
+      Agent__Llm__Profiles__0__Code: ${AGENT_LLM_PROFILE:-local}
+      Agent__Llm__Profiles__0__Name: demo
+      Agent__Llm__Profiles__0__ProviderCode: ${AGENT_LLM_PROVIDER:-openai}
+      Agent__Llm__Profiles__0__Endpoint: ${AGENT_LLM_ENDPOINT}
+      Agent__Llm__Profiles__0__ModelName: ${AGENT_LLM_MODEL}
+      Agent__Llm__Profiles__0__ApiKey: ${AGENT_LLM_API_KEY:-}
+      Agent__Llm__Profiles__0__ChatCompletionsPath: ${AGENT_LLM_CHAT_PATH:-/v1/chat/completions}
+      Agent__Llm__Profiles__0__Temperature: "0.1"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - host-api
+    networks:
+      - xw-apps
+    restart: unless-stopped
+
+networks:
+  xw-apps:
+    driver: bridge

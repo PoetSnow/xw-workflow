@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+	<PackageReference Include="AspNetCore.HealthChecks.MySql" />
+	<PackageReference Include="LiteX.HealthChecks.Redis" />
+	<PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" />
+	<PackageReference Include="MiniProfiler.AspNetCore.Mvc" />
+	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" />
+	<PackageReference Include="FluentValidation.AspNetCore" />
+	<PackageReference Include="MicroElements.Swashbuckle.FluentValidation" />
+	<PackageReference Include="Swashbuckle.AspNetCore" />
+	<PackageReference Include="MiniProfiler.EntityFrameworkCore" />
+	<PackageReference Include="NLog.Web.AspNetCore">
+	 <TreatAsUsed>true</TreatAsUsed>
+	</PackageReference>
+	<PackageReference Include="prometheus-net.AspNetCore" />
+	<PackageReference Include="prometheus-net.DotNetRuntime" />
+  </ItemGroup>
+  <ItemGroup>
+	<FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructures\XW.Infra.Core\XW.Infra.Core.csproj" />
+    <ProjectReference Include="..\XW.Shared.Application\XW.Shared.Application.csproj" />
+    <ProjectReference Include="..\XW.Shared.Remote\XW.Shared.Remote.csproj" />
+  </ItemGroup>
+
+</Project>

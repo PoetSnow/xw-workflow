@@ -1,0 +1,15 @@
+global using System.Linq.Expressions;
+global using System.Net;
+global using System.Reflection;
+global using XW.Infra.Helper;
+global using XW.Infra.IdGenerater.Yitter;
+global using XW.Infra.Repository;
+global using XW.Shared;
+global using XW.Shared.Application.Contracts.Dtos;
+global using XW.Shared.Application.Contracts.ResultModels;
+global using XW.Shared.Application.Mapper;
+global using XW.Shared.Application.Registrar;
+global using XW.Shared.Application.Services;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;

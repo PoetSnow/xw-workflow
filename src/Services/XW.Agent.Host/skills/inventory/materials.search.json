@@ -1,0 +1,31 @@
+{
+  "Code": "materials.search",
+  "Name": "检索物料",
+  "Domain": "inventory",
+  "WhenToUse": "用户明确说物料，或产品检索无结果时，解析 materialId。",
+  "Tags": [ "物料", "编码", "检索" ],
+  "Aliases": [ "查物料", "物料搜索" ],
+  "RelatedCodes": [ "inventory.balances.query", "products.search" ],
+  "Risk": "read",
+  "Description": "按关键词分页检索物料主档。",
+  "Permissions": [ "agent.inventory.read" ],
+  "IntentCode": "materials.search",
+  "Enabled": true,
+  "Parameters": [
+    { "Name": "keywords", "Description": "物料编码或名称", "Required": true, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "GET",
+    "Path": "/api/console/master-data/Materials",
+    "Query": {
+      "pageIndex": "1",
+      "pageSize": "10",
+      "keywords": "{{keywords}}"
+    },
+    "TimeoutSeconds": 20,
+    "MaxRetries": 1,
+    "FallbackToStub": true
+  }
+}

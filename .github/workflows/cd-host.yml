@@ -1,0 +1,156 @@
+# CD：主 Host 镜像构建 →（可选）测试环境发布 →（可选）生产需人工确认
+#
+# 链路：
+#   PR → CI 绿 → 合入 master
+#   → 本 workflow：build/push GHCR（默认始终执行）
+#   → deploy-test / deploy-prod：仅当仓库 Variables 打开开关后才跑
+#
+# 没有测试机 / 生产机时：不要配 SSH Secrets，也不要设 ENABLE_*_DEPLOY。
+# 合入后只会推镜像到 GHCR，不会 SSH，也就不会报 missing server host。
+#
+# 仓库 Settings 可选：
+#   1) Variables（Actions）：
+#      ENABLE_TEST_DEPLOY=true   → 才跑 deploy-test
+#      ENABLE_PROD_DEPLOY=true   → 才跑 deploy-prod
+#   2) Environments → 新建 test、production
+#      production 勾选 Required reviewers（人工确认）
+#   3) Secrets（仓库或 Environment）：
+#      TEST_SSH_HOST / TEST_SSH_USER / TEST_SSH_KEY
+#      PROD_SSH_HOST / PROD_SSH_USER / PROD_SSH_KEY
+#   4) 服务器一次性：把 deploy/docker-compose.host.yml + .env
+#      放到 DEPLOY_DIR（默认 /opt/xw），并 docker login ghcr.io（若镜像私有）
+
+name: CD Host
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - "src/**"
+      - "Directory.*.props"
+      - "XW.sln"
+      - "src/XW.Host.API/Dockerfile"
+      - "deploy/**"
+      - ".github/workflows/cd-host.yml"
+  workflow_dispatch:
+    inputs:
+      skip_test:
+        description: "Skip deploy to test"
+        type: boolean
+        default: true
+      skip_prod:
+        description: "Skip deploy to production (only build + optional test)"
+        type: boolean
+        default: true
+
+concurrency:
+  group: cd-host-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/xw-host-api
+
+jobs:
+  build-and-push:
+    name: Build & push image
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tag }}
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Image meta
+        id: meta
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          NAME="ghcr.io/${OWNER}/xw-host-api"
+          TAG="${{ github.sha }}"
+          echo "image=${NAME}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Will push ${NAME}:${TAG} and ${NAME}:latest"
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: src/XW.Host.API/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+            ${{ steps.meta.outputs.image }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-test:
+    name: Deploy test
+    needs: build-and-push
+    # 无测试机：不设 ENABLE_TEST_DEPLOY，本 job 直接 skipped
+    if: |
+      vars.ENABLE_TEST_DEPLOY == 'true' &&
+      (github.event_name != 'workflow_dispatch' || inputs.skip_test != true)
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.TEST_SSH_HOST }}
+          username: ${{ secrets.TEST_SSH_USER }}
+          key: ${{ secrets.TEST_SSH_KEY }}
+          script: |
+            set -e
+            export HOST_API_IMAGE="${{ needs.build-and-push.outputs.image }}:${{ needs.build-and-push.outputs.image_tag }}"
+            DEPLOY_DIR="${{ vars.TEST_DEPLOY_DIR }}"
+            DEPLOY_DIR="${DEPLOY_DIR:-/opt/xw}"
+            cd "$DEPLOY_DIR"
+            echo "$HOST_API_IMAGE" > .image-tag
+            export HOST_API_IMAGE
+            docker compose -f docker-compose.host.yml pull host-api
+            docker compose -f docker-compose.host.yml up -d host-api
+            docker compose -f docker-compose.host.yml ps host-api
+
+  deploy-prod:
+    name: Deploy production (manual approve)
+    needs: [build-and-push, deploy-test]
+    if: |
+      always() &&
+      vars.ENABLE_PROD_DEPLOY == 'true' &&
+      needs.build-and-push.result == 'success' &&
+      (needs.deploy-test.result == 'success' || needs.deploy-test.result == 'skipped') &&
+      (github.event_name != 'workflow_dispatch' || inputs.skip_prod != true)
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ${{ secrets.PROD_SSH_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            set -e
+            export HOST_API_IMAGE="${{ needs.build-and-push.outputs.image }}:${{ needs.build-and-push.outputs.image_tag }}"
+            DEPLOY_DIR="${{ vars.PROD_DEPLOY_DIR }}"
+            DEPLOY_DIR="${DEPLOY_DIR:-/opt/xw}"
+            cd "$DEPLOY_DIR"
+            echo "$HOST_API_IMAGE" > .image-tag
+            export HOST_API_IMAGE
+            docker compose -f docker-compose.host.yml pull host-api
+            docker compose -f docker-compose.host.yml up -d host-api
+            docker compose -f docker-compose.host.yml ps host-api

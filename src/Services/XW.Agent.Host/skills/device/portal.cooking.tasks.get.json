@@ -1,0 +1,33 @@
+{
+  "Code": "portal.cooking.tasks.get",
+  "Name": "查看我的制作任务",
+  "Domain": "device",
+  "WhenToUse": "小程序会员要查看自己的某一个制作任务。",
+  "Tags": [ "小程序", "制作", "任务", "只读" ],
+  "Aliases": [ "我的制作任务", "我的煮茶进度" ],
+  "RelatedCodes": [ "portal.cooking.tasks.cancel" ],
+  "Surface": "portal",
+  "Risk": "read",
+  "Description": "GET 小程序任务详情。Host 按当前登录会员判断是不是本人的任务。",
+  "Permissions": [],
+  "IntentCode": "portal.cooking.tasks.get",
+  "Enabled": true,
+  "ConfirmRequired": false,
+  "OutputHints": [
+    { "Name": "status", "Description": "任务状态" },
+    { "Name": "currentStepNo", "Description": "当前步骤号" },
+    { "Name": "rejectReason", "Description": "拒绝原因" }
+  ],
+  "Parameters": [
+    { "Name": "id", "Description": "自己的制作任务 Id", "Required": true, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "GET",
+    "Path": "/api/portal/cooking/tasks/{{id}}",
+    "TimeoutSeconds": 20,
+    "MaxRetries": 1,
+    "FallbackToStub": false
+  }
+}

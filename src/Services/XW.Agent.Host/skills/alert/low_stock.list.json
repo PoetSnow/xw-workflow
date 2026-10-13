@@ -1,0 +1,15 @@
+{
+  "Code": "alert.low_stock.list",
+  "Name": "低库存预警",
+  "Domain": "alert",
+  "WhenToUse": "用户要看低于安全库存或库存风险列表，不指定单一 SKU。",
+  "Tags": [ "预警", "低库存", "安全库存" ],
+  "Aliases": [ "缺货预警", "库存告警", "哪些快断货" ],
+  "RelatedCodes": [ "inventory.balances.query" ],
+  "Risk": "read",
+  "Description": "列出低于安全库存的商品。",
+  "Permissions": [ "agent.alert.read" ],
+  "IntentCode": "list_low_stock_alerts",
+  "Enabled": true,
+  "Parameters": []
+}

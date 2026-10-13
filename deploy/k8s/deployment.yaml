@@ -1,0 +1,138 @@
+# XW Host API — k3s 单节点最小 Deployment
+#
+# 前置：
+#   kubectl create namespace xw
+#   kubectl create secret generic xw-host-api-secret -n xw --from-env-file=deploy/k8s/secret.env
+#   # 若 GHCR 镜像私有：kubectl create secret docker-registry ghcr-secret -n xw \
+#   #   --docker-server=ghcr.io --docker-username=YOUR_GH_USER --docker-password=YOUR_PAT
+#
+# 部署：
+#   kubectl apply -f deploy/k8s/
+#   kubectl -n xw rollout status deployment/xw-host-api
+#
+# 更新镜像（配合 CD）：
+#   kubectl -n xw set image deployment/xw-host-api \
+#     host-api=ghcr.io/YOUR_ORG/xw-host-api:COMMIT_SHA
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xw-host-api
+  namespace: xw
+  labels:
+    app.kubernetes.io/name: xw-host-api
+    app.kubernetes.io/component: host-api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: xw-host-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: xw-host-api
+        app.kubernetes.io/component: host-api
+    spec:
+      # GHCR 私有镜像时取消注释
+      # imagePullSecrets:
+      #   - name: ghcr-secret
+      hostAliases:
+        # 与 docker-compose.host.yml 的 extra_hosts 一致，让 Pod 能访问宿主机 MySQL/Redis/RabbitMQ
+        # k3s 若已支持 host.k3s.internal，可把连接串里的 host.docker.internal 改成 host.k3s.internal 并删掉 hostAliases
+        - ip: "172.17.0.1"
+          hostnames:
+            - host.docker.internal
+      containers:
+        - name: host-api
+          image: ghcr.io/YOUR_GITHUB_ORG/xw-host-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                secretKeyRef:
+                  name: xw-host-api-secret
+                  key: ASPNETCORE_ENVIRONMENT
+            - name: ASPNETCORE_URLS
+              value: "http://+:8080"
+            - name: Mysql__ConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: xw-host-api-secret
+                  key: Mysql__ConnectionString
+            - name: Mysql__ServerVersion
+              valueFrom:
+                secretKeyRef:
+                  name: xw-host-api-secret
+                  key: Mysql__ServerVersion
+            - name: Mysql__ServerType
+              value: "MySql"
+            - name: SysLogDb__DbType
+              value: "mysql"
+            - name: SysLogDb__ConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: xw-host-api-secret
+                  key: SysLogDb__ConnectionString
+            - name: Redis__Dbconfig__ConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: xw-host-api-secret
+                  key: Redis__Dbconfig__ConnectionString
+            - name: RabbitMq__HostName
+              valueFrom:
+                secretKeyRef:
+                  name: xw-host-api-secret
+                  key: RabbitMq__HostName
+            - name: RabbitMq__Port
+              valueFrom:
+                secretKeyRef:
+                  name: xw-host-api-secret
+                  key: RabbitMq__Port
+            - name: RabbitMq__VirtualHost
+              valueFrom:
+                secretKeyRef:
+                  name: xw-host-api-secret
+                  key: RabbitMq__VirtualHost
+            - name: RabbitMq__UserName
+              valueFrom:
+                secretKeyRef:
+                  name: xw-host-api-secret
+                  key: RabbitMq__UserName
+            - name: RabbitMq__Password
+              valueFrom:
+                secretKeyRef:
+                  name: xw-host-api-secret
+                  key: RabbitMq__Password
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 768Mi
+          # Host API 未暴露 HTTP health 端点，先用 TCP 探针
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+            failureThreshold: 3

@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetCore.CAP"  />
+    <PackageReference Include="DotNetCore.CAP.RabbitMQ"  />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"  />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions"  />
+    <PackageReference Include="Polly"  />
+    <PackageReference Include="RabbitMQ.Client" />
+    <PackageReference Include="SkyAPM.Diagnostics.CAP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XW.Infra.Core\XW.Infra.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,30 @@
+{
+  "Code": "device.pots.list",
+  "Name": "查询壶列表",
+  "Domain": "device",
+  "WhenToUse": "运营后台要查看壶列表。只读，不下发指令。",
+  "Tags": [ "设备", "壶", "只读" ],
+  "Aliases": [ "壶列表", "设备列表", "有哪些壶" ],
+  "RelatedCodes": [ "device.pots.get" ],
+  "Surface": "console",
+  "Risk": "read",
+  "Description": "运营后台查看壶列表。与制作任务同一查看权限 pot-cooking。在线状态由 Host 给出。",
+  "Permissions": [ "pot-cooking" ],
+  "IntentCode": "device.pots.list",
+  "Enabled": true,
+  "ConfirmRequired": false,
+  "OutputHints": [
+    { "Name": "online", "Description": "是否在线" },
+    { "Name": "workState", "Description": "工作状态" }
+  ],
+  "Parameters": [],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "GET",
+    "Path": "/api/console/pots",
+    "TimeoutSeconds": 20,
+    "MaxRetries": 1,
+    "FallbackToStub": false
+  }
+}

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Helper\XW.Infra.Helper.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.IdGenerater\XW.Infra.IdGenerater.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Redis.Caching\XW.Infra.Redis.Caching.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Redis\XW.Infra.Redis.csproj" />
+    <ProjectReference Include="..\..\..\Shared\XW.Shared.Application\XW.Shared.Application.csproj" />
+    <ProjectReference Include="..\XW.System.Application.Contracts\XW.System.Application.Contracts.csproj" />
+    <ProjectReference Include="..\XW.System.Repository\XW.System.Repository.csproj" />
+  </ItemGroup>
+
+</Project>

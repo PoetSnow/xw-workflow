@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
+    <PackageReference Include="Refit.HttpClientFactory" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructures\XW.Infra.Core\XW.Infra.Core.csproj" />
+    <ProjectReference Include="..\..\Infrastructures\XW.Infra.Helper\XW.Infra.Helper.csproj" />
+    <ProjectReference Include="..\XW.Shared\XW.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,30 @@
+**/.classpath
+**/.dockerignore
+**/.env
+**/.git
+**/.gitignore
+**/.project
+**/.settings
+**/.toolstarget
+**/.vs
+**/.vscode
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+**/azds.yaml
+**/bin
+**/charts
+**/node_modules
+**/npm-debug.log
+**/obj
+**/secrets.dev.yaml
+**/values.dev.yaml
+LICENSE
+README.md
+# client 需参与 console 镜像构建（client/Dockerfile），勿整目录忽略
+# node_modules / dist 已由上方 **/node_modules、以及下面规则覆盖
+client/dist
+client/node_modules
+docs
+tests
+**/.cursor

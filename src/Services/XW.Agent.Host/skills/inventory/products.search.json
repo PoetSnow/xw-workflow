@@ -1,0 +1,33 @@
+{
+  "Code": "products.search",
+  "Name": "检索产品",
+  "Domain": "inventory",
+  "Purpose": "按品名或 SKU 检索产品主档，解析 productId",
+  "WhenToUse": "需要把品名/SKU 解析为 productId，或查库存前缺少产品 Id。",
+  "Tags": [ "产品", "SKU", "品名", "检索" ],
+  "Aliases": [ "查产品", "找SKU", "产品搜索" ],
+  "RelatedCodes": [ "inventory.balances.query", "materials.search" ],
+  "Risk": "read",
+  "Description": "按关键词分页检索产品主档。返回 id、code、name。",
+  "Permissions": [ "agent.inventory.read" ],
+  "IntentCode": "products.search",
+  "Enabled": true,
+  "ConfirmRequired": false,
+  "Parameters": [
+    { "Name": "keywords", "Description": "SKU、产品编码或品名", "Required": true, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "GET",
+    "Path": "/api/console/product/Products",
+    "Query": {
+      "pageIndex": "1",
+      "pageSize": "10",
+      "keywords": "{{keywords}}"
+    },
+    "TimeoutSeconds": 20,
+    "MaxRetries": 1,
+    "FallbackToStub": true
+  }
+}

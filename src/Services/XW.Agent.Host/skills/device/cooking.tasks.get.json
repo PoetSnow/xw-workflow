@@ -1,0 +1,33 @@
+{
+  "Code": "device.cooking.tasks.get",
+  "Name": "查询单个制作任务",
+  "Domain": "device",
+  "WhenToUse": "运营后台给出制作任务 Id，要查看该任务状态和当前步骤。只读。",
+  "Tags": [ "设备", "制作", "任务", "只读" ],
+  "Aliases": [ "查制作任务", "任务详情" ],
+  "RelatedCodes": [ "device.cooking.tasks.list" ],
+  "Surface": "console",
+  "Risk": "read",
+  "Description": "运营后台按任务 Id 查看制作任务。权限与菜单 pot-cooking 一致。不等待设备 ACK。",
+  "Permissions": [ "pot-cooking" ],
+  "IntentCode": "device.cooking.tasks.get",
+  "Enabled": true,
+  "ConfirmRequired": false,
+  "OutputHints": [
+    { "Name": "status", "Description": "任务状态" },
+    { "Name": "currentStepNo", "Description": "当前步骤号" },
+    { "Name": "rejectReason", "Description": "拒绝原因" }
+  ],
+  "Parameters": [
+    { "Name": "id", "Description": "制作任务 Id", "Required": true, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "GET",
+    "Path": "/api/console/cooking/tasks/{{id}}",
+    "TimeoutSeconds": 20,
+    "MaxRetries": 1,
+    "FallbackToStub": false
+  }
+}

@@ -1,0 +1,13 @@
+services:
+  emqx:
+    image: emqx/emqx:5.8.6
+    container_name: xw-emqx
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "18083:18083"
+    environment:
+      EMQX_DASHBOARD__DEFAULT_PASSWORD: public
+      EMQX_LISTENERS__TCP__DEFAULT__BIND: 0.0.0.0:1883
+      # 本地联调先关监听器认证，模拟器才能连上。HTTP 认证接口仍保留在 Host。
+      EMQX_LISTENERS__TCP__DEFAULT__ENABLE_AUTHN: "false"

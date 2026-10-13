@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="MongoDB.EntityFrameworkCore"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XW.Infra.Repository.EfCore\XW.Infra.Repository.EfCore.csproj" />
+    <ProjectReference Include="..\XW.Infra.Repository\XW.Infra.Repository.csproj" />
+  </ItemGroup>
+
+</Project>

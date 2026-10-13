@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.IdGenerater\XW.Infra.IdGenerater.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Repository.EfCore.MySql\XW.Infra.Repository.EfCore.MySql.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Repository.EfCore\XW.Infra.Repository.EfCore.csproj" />
+    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Repository\XW.Infra.Repository.csproj" />
+    <ProjectReference Include="..\..\..\Shared\XW.Shared.Application\XW.Shared.Application.csproj" />
+    <ProjectReference Include="..\..\XW.System\XW.System.Application.Contracts\XW.System.Application.Contracts.csproj" />
+    <ProjectReference Include="..\XW.Approve.Application.Contracts\XW.Approve.Application.Contracts.csproj" />
+    <ProjectReference Include="..\XW.Approve.Domain\XW.Approve.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

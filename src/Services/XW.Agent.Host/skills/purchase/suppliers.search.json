@@ -1,0 +1,31 @@
+{
+  "Code": "suppliers.search",
+  "Name": "检索供应商",
+  "Domain": "purchase",
+  "WhenToUse": "创建采购单或比价前需要解析供应商为 supplierId。",
+  "Tags": [ "供应商", "采购", "比价" ],
+  "Aliases": [ "查供应商", "找供应商" ],
+  "RelatedCodes": [ "purchase.price.compare", "purchase.order.create.material", "purchase.order.create.product" ],
+  "Risk": "read",
+  "Description": "按关键词分页检索供应商。",
+  "Permissions": [ "agent.purchase.read" ],
+  "IntentCode": "suppliers.search",
+  "Enabled": true,
+  "Parameters": [
+    { "Name": "keywords", "Description": "供应商编码或名称", "Required": true, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "GET",
+    "Path": "/api/console/master-data/Suppliers",
+    "Query": {
+      "pageIndex": "1",
+      "pageSize": "10",
+      "keywords": "{{keywords}}"
+    },
+    "TimeoutSeconds": 20,
+    "MaxRetries": 1,
+    "FallbackToStub": false
+  }
+}

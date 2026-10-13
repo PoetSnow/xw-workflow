@@ -1,0 +1,49 @@
+# 本机 Docker Desktop：RabbitMQ + EMQX
+# 不含 MySQL / Redis / PostgreSQL（用 Windows 已装服务）
+# 不要用本文件替代 deploy/ 预发布 compose。
+#
+# 用法（在本文件所在目录）：
+#   docker compose -f docker-compose.local.yml up -d
+# 停：
+#   docker compose -f docker-compose.local.yml down
+#
+# Host / Integration 的 RabbitMq:HostName 请指 127.0.0.1（不要再用 192.168.1.150）
+
+name: xw-local
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: xw-local-rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - xw_local_rabbit:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+  emqx:
+    image: emqx/emqx:5.8.6
+    container_name: xw-local-emqx
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "18083:18083"
+    environment:
+      EMQX_DASHBOARD__DEFAULT_PASSWORD: public
+      EMQX_LISTENERS__TCP__DEFAULT__BIND: 0.0.0.0:1883
+      EMQX_LISTENERS__TCP__DEFAULT__ENABLE_AUTHN: "false"
+    restart: unless-stopped
+
+volumes:
+  xw_local_rabbit:
+

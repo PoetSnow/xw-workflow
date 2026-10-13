@@ -1,0 +1,11 @@
+global using System.IdentityModel.Tokens.Jwt;
+global using XW.System.Application.Contracts.Interfaces;
+global using XW.Shared;
+global using XW.Shared.Application.Contracts.Dtos;
+global using XW.Shared.WebApi;
+global using XW.Shared.WebApi.Authentication.Bearer;
+global using XW.Shared.WebApi.Authorization;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.Options;
+global using Microsoft.AspNetCore.Http;

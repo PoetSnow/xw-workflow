@@ -1,0 +1,26 @@
+# 服务器拉取镜像用（不在服务器上 build）
+# 配合仓库根目录 .env；由 CD 写入 HOST_API_IMAGE
+
+services:
+  host-api:
+    image: ${HOST_API_IMAGE:?set HOST_API_IMAGE to ghcr image:tag}
+    container_name: xw-host-api
+    ports:
+      - "${HOST_API_PORT:-8080}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://+:8080
+      Mysql__ConnectionString: ${MYSQL_CONNECTION}
+      Mysql__ServerVersion: ${MYSQL_SERVER_VERSION:-5.7.44}
+      Mysql__ServerType: MySql
+      SysLogDb__DbType: mysql
+      SysLogDb__ConnectionString: ${SYSLOG_MYSQL_CONNECTION}
+      Redis__Dbconfig__ConnectionString: ${REDIS_CONNECTION}
+      RabbitMq__HostName: ${RABBITMQ_HOST}
+      RabbitMq__Port: ${RABBITMQ_PORT:-5672}
+      RabbitMq__VirtualHost: ${RABBITMQ_VHOST:-/}
+      RabbitMq__UserName: ${RABBITMQ_USER:-guest}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-guest}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

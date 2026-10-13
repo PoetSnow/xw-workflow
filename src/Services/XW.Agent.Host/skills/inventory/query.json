@@ -1,0 +1,22 @@
+{
+  "Code": "inventory.query",
+  "Name": "库存查询",
+  "Domain": "inventory",
+  "WhenToUse": "用户要查某个商品还剩多少，只给了品名或 SKU。",
+  "Tags": [ "库存", "现存", "SKU", "品名" ],
+  "Aliases": [ "查库存", "库存多少", "还有多少货" ],
+  "Risk": "read",
+  "Description": "按品名或 SKU 查询库存：内部先检索产品/物料再查余额。",
+  "Permissions": [ "agent.inventory.read" ],
+  "IntentCode": "inventory.query",
+  "Enabled": true,
+  "Parameters": [
+    { "Name": "keywords", "Type": "string", "Required": false, "Description": "SKU 或品名" },
+    { "Name": "productId", "Type": "string", "Required": false, "Description": "产品主键" },
+    { "Name": "materialId", "Type": "string", "Required": false, "Description": "物料主键" }
+  ],
+  "Entry": {
+    "Kind": "workflow",
+    "Target": "wf.inventory.query.by_keyword"
+  }
+}

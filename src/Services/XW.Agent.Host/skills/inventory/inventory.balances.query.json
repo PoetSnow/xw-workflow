@@ -1,0 +1,38 @@
+{
+  "Code": "inventory.balances.query",
+  "Name": "查询库存账",
+  "Domain": "inventory",
+  "WhenToUse": "已有 productId 或 materialId，查询现存/预留数量。",
+  "Tags": [ "库存", "现存", "可售", "仓库" ],
+  "Aliases": [ "查库存账", "现存多少" ],
+  "RelatedCodes": [ "products.search", "materials.search" ],
+  "Risk": "read",
+  "Description": "按 productId 或 materialId 查询数量库存账。至少提供一个 Id。",
+  "Permissions": [ "agent.inventory.read" ],
+  "IntentCode": "inventory.balances.query",
+  "Enabled": true,
+  "OutputHints": [
+    { "Name": "qtyOnHand", "Description": "现存数量" }
+  ],
+  "Parameters": [
+    { "Name": "productId", "Description": "产品主键", "Required": false, "Type": "string" },
+    { "Name": "materialId", "Description": "物料主键", "Required": false, "Type": "string" },
+    { "Name": "warehouseId", "Description": "仓库 Id（可选）", "Required": false, "Type": "string" }
+  ],
+  "Http": {
+    "Adapter": "host",
+    "AuthProfile": "forward-caller",
+    "Method": "GET",
+    "Path": "/api/console/supply-chain/InventoryBalances",
+    "Query": {
+      "pageIndex": "1",
+      "pageSize": "20",
+      "productId": "{{productId}}",
+      "materialId": "{{materialId}}",
+      "warehouseId": "{{warehouseId}}"
+    },
+    "TimeoutSeconds": 20,
+    "MaxRetries": 1,
+    "FallbackToStub": false
+  }
+}

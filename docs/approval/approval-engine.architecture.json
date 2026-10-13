@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "可配置审批引擎",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "submit-path",
+        "label": "提交与选流程",
+        "focus": ["console", "perm", "biz", "bind", "engine"],
+        "note": "员工提交后先过菜单权限，再按业务类型和表单快照绑定具体流程版本。"
+      },
+      {
+        "id": "resolve-path",
+        "label": "角色加部门找人",
+        "focus": ["engine", "resolver", "sysdb"],
+        "note": "部门经理和主管不写在机构表上，按角色编码加用户部门解析。"
+      },
+      {
+        "id": "store-path",
+        "label": "三套表各管各的",
+        "focus": ["biz", "engine", "bizdb", "apprdb", "sysdb"],
+        "note": "业务单据、审批定义与实例、现有 RBAC 分表存放，不平行再建用户体系。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "console",
+      "type": "frontend",
+      "label": "Vue Console",
+      "sublabel": "提交 / 待办 / 已办",
+      "pos": [80, 88],
+      "size": [160, 64]
+    },
+    {
+      "id": "perm",
+      "type": "security",
+      "label": "菜单权限",
+      "sublabel": "sys_menu 按钮码",
+      "pos": [80, 268],
+      "size": [160, 64]
+    },
+    {
+      "id": "biz",
+      "type": "backend",
+      "label": "业务模块",
+      "sublabel": "合同 / 项目 / 预算 / 采购",
+      "pos": [320, 268],
+      "size": [168, 64]
+    },
+    {
+      "id": "bind",
+      "type": "backend",
+      "label": "流程绑定",
+      "sublabel": "process_binding",
+      "pos": [560, 268],
+      "size": [160, 64]
+    },
+    {
+      "id": "engine",
+      "type": "backend",
+      "label": "审批引擎",
+      "sublabel": "XW.Approval",
+      "pos": [800, 268],
+      "size": [160, 64],
+      "tag": "新模块"
+    },
+    {
+      "id": "resolver",
+      "type": "security",
+      "label": "审批人解析",
+      "sublabel": "角色 + 部门",
+      "pos": [1040, 268],
+      "size": [160, 64]
+    },
+    {
+      "id": "bizdb",
+      "type": "database",
+      "label": "业务单据",
+      "sublabel": "contract 等",
+      "pos": [320, 500],
+      "size": [168, 64]
+    },
+    {
+      "id": "apprdb",
+      "type": "database",
+      "label": "审批存储",
+      "sublabel": "process_ / approval_",
+      "pos": [800, 500],
+      "size": [160, 64]
+    },
+    {
+      "id": "sysdb",
+      "type": "database",
+      "label": "现有 RBAC",
+      "sublabel": "sys_user / role / org",
+      "pos": [1040, 500],
+      "size": [160, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "NX-AIHealth-Platform",
+      "wraps": ["console"]
+    },
+    {
+      "kind": "region",
+      "label": "XW.Host.API",
+      "wraps": ["perm", "biz", "bind", "engine", "resolver"]
+    },
+    {
+      "kind": "region",
+      "label": "MySQL nx_devices_erp",
+      "wraps": ["bizdb", "apprdb", "sysdb"]
+    },
+    {
+      "kind": "security-group",
+      "label": "复用现有 RBAC，不新建用户表",
+      "wraps": ["perm", "resolver", "sysdb"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "console-perm",
+      "from": "console",
+      "to": "perm",
+      "label": "员工 JWT",
+      "variant": "emphasis",
+      "labelDy": 24
+    },
+    {
+      "id": "perm-biz",
+      "from": "perm",
+      "to": "biz",
+      "label": "放行提交"
+    },
+    {
+      "id": "biz-bind",
+      "from": "biz",
+      "to": "bind",
+      "label": "类型与快照",
+      "labelDy": -26
+    },
+    {
+      "id": "bind-engine",
+      "from": "bind",
+      "to": "engine",
+      "label": "锁定流程版本",
+      "variant": "emphasis"
+    },
+    {
+      "id": "engine-resolver",
+      "from": "engine",
+      "to": "resolver",
+      "label": "解析当前节点"
+    },
+    {
+      "id": "resolver-sysdb",
+      "from": "resolver",
+      "to": "sysdb",
+      "label": "role_in_dept",
+      "variant": "security",
+      "labelDy": 24
+    },
+    {
+      "id": "biz-bizdb",
+      "from": "biz",
+      "to": "bizdb",
+      "label": "更新单据状态",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "engine-apprdb",
+      "from": "engine",
+      "to": "apprdb",
+      "label": "实例与待办",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "身份复用",
+      "items": [
+        "审批人只指向现有 sys_user / sys_role / sys_organization",
+        "菜单权限管谁能提交和看待办，不管谁该审这一单"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "找人规则",
+      "items": [
+        "部门经理 DEPT_MANAGER + 单据部门",
+        "部门主管 DEPT_SUPERVISOR + 发起人部门",
+        "总经理 / 财务只按角色，不按部门过滤"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "多业务",
+      "items": [
+        "合同、项目、预算、采购共用一个引擎",
+        "差别只在字段定义和 process_binding"
+      ]
+    }
+  ]
+}

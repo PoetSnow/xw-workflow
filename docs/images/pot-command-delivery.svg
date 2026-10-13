@@ -1,0 +1,78 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 640" width="980" height="640">
+  <rect width="980" height="640" fill="#ffffff"/>
+  <text x="24" y="36" fill="#18181b" font-size="20" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-weight="700">壶指令下发</text>
+  <text x="24" y="60" fill="#52525b" font-size="13" font-family="Segoe UI, Microsoft YaHei, sans-serif">配方决定有几步。队列里只有当前一步。SUCCESS 之后才发下一步。影子不推动步骤。</text>
+  <text x="24" y="96" fill="#18181b" font-size="15" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-weight="700">主链路</text>
+  <g font-family="Segoe UI, Microsoft YaHei, sans-serif">
+    <rect x="24" y="112" width="128" height="58" rx="6" fill="#f4f4f5" stroke="#d4d4d8"/>
+    <text x="88" y="136" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">小程序</text>
+    <text x="88" y="154" text-anchor="middle" fill="#52525b" font-size="11">HTTP 开始制作</text>
+    <rect x="188" y="112" width="140" height="58" rx="6" fill="#f4f4f5" stroke="#d4d4d8"/>
+    <text x="258" y="136" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">Cooking 接口</text>
+    <text x="258" y="154" text-anchor="middle" fill="#52525b" font-size="11">提交后才发通知</text>
+    <rect x="364" y="112" width="176" height="58" rx="6" fill="#eef2ff" stroke="#d4d4d8"/>
+    <text x="452" y="136" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">MySQL</text>
+    <text x="452" y="154" text-anchor="middle" fill="#52525b" font-size="11">任务、全部步骤、发件箱</text>
+    <rect x="576" y="112" width="140" height="58" rx="6" fill="#eef2ff" stroke="#2563eb"/>
+    <text x="646" y="136" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">RabbitMQ</text>
+    <text x="646" y="154" text-anchor="middle" fill="#52525b" font-size="11">只放当前步</text>
+    <rect x="752" y="112" width="128" height="58" rx="6" fill="#f4f4f5" stroke="#2563eb"/>
+    <text x="816" y="136" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">消费者</text>
+    <text x="816" y="154" text-anchor="middle" fill="#52525b" font-size="11">可按积压加开</text>
+    <path d="M152 141 H188" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <path d="M328 141 H364" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <path d="M540 141 H576" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <path d="M716 141 H752" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <rect x="752" y="230" width="128" height="58" rx="6" fill="#f4f4f5" stroke="#d4d4d8"/>
+    <text x="816" y="254" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">EMQX</text>
+    <text x="816" y="272" text-anchor="middle" fill="#52525b" font-size="11">QoS 1 下发</text>
+    <rect x="576" y="230" width="140" height="58" rx="6" fill="#f4f4f5" stroke="#d4d4d8"/>
+    <text x="646" y="254" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">壶</text>
+    <text x="646" y="272" text-anchor="middle" fill="#52525b" font-size="11">本地判断并执行</text>
+    <rect x="364" y="230" width="176" height="58" rx="6" fill="#f4f4f5" stroke="#2563eb"/>
+    <text x="452" y="254" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">回执处理</text>
+    <text x="452" y="272" text-anchor="middle" fill="#52525b" font-size="11">只认 SUCCESS 放行</text>
+    <rect x="24" y="230" width="176" height="58" rx="6" fill="#f4f4f5" stroke="#d4d4d8"/>
+    <text x="112" y="254" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">兜底</text>
+    <text x="112" y="272" text-anchor="middle" fill="#52525b" font-size="11">超时未确认 / 壶上线</text>
+    <path d="M816 170 V230" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <path d="M752 259 H716" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <path d="M576 259 H540" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <path d="M452 230 V188 H646 V170" fill="none" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arrBlue)"/>
+    <path d="M200 248 H280 V160 H576" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <text x="24" y="320" fill="#18181b" font-size="13" font-weight="600">发给壶之前</text>
+    <text x="24" y="342" fill="#52525b" font-size="12">必须是该壶当前步，epoch 一致，任务仍在执行。同一 commandId 再到壶上，只重放回执，不重复执行。</text>
+    <text x="24" y="362" fill="#52525b" font-size="12">兜底只重发当前步，不扫描全表当主链路。蓝线表示 SUCCESS 之后才把配方的下一步放进 RabbitMQ。</text>
+  </g>
+  <text x="24" y="408" fill="#18181b" font-size="15" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-weight="700">壶主动上报（不进入制作队列）</text>
+  <g font-family="Segoe UI, Microsoft YaHei, sans-serif">
+    <rect x="24" y="428" width="150" height="58" rx="6" fill="#f4f4f5" stroke="#d4d4d8"/>
+    <text x="99" y="452" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">壶</text>
+    <text x="99" y="470" text-anchor="middle" fill="#52525b" font-size="11">不等云端来问</text>
+    <rect x="214" y="428" width="170" height="58" rx="6" fill="#f4f4f5" stroke="#d4d4d8"/>
+    <text x="299" y="452" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">EMQX</text>
+    <text x="299" y="470" text-anchor="middle" fill="#52525b" font-size="11">pot/序列号/up/…</text>
+    <rect x="424" y="428" width="160" height="58" rx="6" fill="#f4f4f5" stroke="#d4d4d8"/>
+    <text x="504" y="452" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">上行订阅</text>
+    <text x="504" y="470" text-anchor="middle" fill="#52525b" font-size="11">pot/+/up/#</text>
+    <rect x="624" y="428" width="250" height="58" rx="6" fill="#eef2ff" stroke="#d4d4d8"/>
+    <text x="749" y="452" text-anchor="middle" fill="#18181b" font-size="13" font-weight="600">影子 / 遥测</text>
+    <text x="749" y="470" text-anchor="middle" fill="#52525b" font-size="11">水温、工位、在线、能力，只展示</text>
+    <path d="M174 457 H214" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <path d="M384 457 H424" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <path d="M584 457 H624" fill="none" stroke="#71717a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <text x="24" y="520" fill="#52525b" font-size="12">水温够不够由壶在执行指令时用本地探头判断，做到了再回 SUCCESS。云端不根据影子水温发下一步。</text>
+    <text x="24" y="548" fill="#18181b" font-size="13" font-weight="600">回执</text>
+    <text x="24" y="570" fill="#52525b" font-size="12">SUCCESS：收口，有下一步才入队。RECEIVED / RUNNING：同一 commandId 重发，后续步骤不动。</text>
+    <text x="24" y="590" fill="#52525b" font-size="12">失败或超时：任务失败，发 STOP，未下发步骤取消。上一单未结束时再点开始：拒绝。</text>
+    <text x="24" y="610" fill="#52525b" font-size="12">确认重做：旧单作废，epoch+1，新任务从配方第一步入队。旧回执迟到也不能放出后续步骤。</text>
+  </g>
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#71717a"/>
+    </marker>
+    <marker id="arrBlue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#2563eb"/>
+    </marker>
+  </defs>
+</svg>

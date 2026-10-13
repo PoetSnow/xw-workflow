@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Helper\XW.Infra.Helper.csproj" />
+    <ProjectReference Include="..\..\..\Shared\XW.Shared.Application\XW.Shared.Application.csproj" />
+    <ProjectReference Include="..\XW.Approve.Application.Contracts\XW.Approve.Application.Contracts.csproj" />
+    <ProjectReference Include="..\XW.Approve.Domain\XW.Approve.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

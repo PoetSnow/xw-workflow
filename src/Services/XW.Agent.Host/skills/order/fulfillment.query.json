@@ -1,0 +1,16 @@
+{
+  "Code": "order.fulfillment.query",
+  "Name": "查询订单履约",
+  "Domain": "order",
+  "WhenToUse": "用户提供或询问订单号的发货/物流状态。",
+  "Tags": [ "订单", "履约", "物流", "发货" ],
+  "Aliases": [ "查订单", "物流到哪了", "发货状态" ],
+  "Risk": "read",
+  "Description": "按订单号查询发货与物流状态。",
+  "Permissions": [ "agent.order.read" ],
+  "IntentCode": "query_order_fulfillment",
+  "Enabled": true,
+  "Parameters": [
+    { "Name": "orderNo", "Description": "订单号", "Required": true, "Type": "string" }
+  ]
+}

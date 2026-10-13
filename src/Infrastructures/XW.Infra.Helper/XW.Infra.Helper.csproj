@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions"  />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XW.Infra.Core\XW.Infra.Core.csproj" />
+  </ItemGroup>
+
+</Project>
