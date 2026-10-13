@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\XW.Infra.Core\XW.Infra.Core.csproj" />
     <ProjectReference Include="..\XW.Infra.Redis\XW.Infra.Redis.csproj" />
+    <ProjectReference Include="..\..\Shared\XW.Shared.Interception\XW.Shared.Interception.csproj" />
   </ItemGroup>
 
 </Project>

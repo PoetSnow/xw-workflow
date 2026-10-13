@@ -1,12 +1,9 @@
 using XW.Approve.Domain.Ports;
-using XW.System.Application.Contracts.Interfaces;
+using XW.Shared.Application.Contracts.Integrations;
 
 namespace XW.Approve.Infrastructure.Readers;
 
-internal sealed class ApproveActorDirectory(
-    IUserService userService,
-    IPositionService positionService,
-    IOrganizationService organizationService) : IApproveActorDirectory
+internal sealed class ApproveActorDirectory(IOrgDirectory orgDirectory) : IApproveActorDirectory
 {
     /// <inheritdoc />
     public async Task<IReadOnlyDictionary<long, string>> GetUserNamesAsync(
@@ -18,7 +15,7 @@ internal sealed class ApproveActorDirectory(
             return new Dictionary<long, string>();
         }
 
-        var users = await userService.GetManyAsync(userIds.Distinct().ToList());
+        var users = await orgDirectory.ListUsersAsync(userIds.Distinct().ToList(), cancellationToken);
         return users.ToDictionary(x => x.Id, x => string.IsNullOrWhiteSpace(x.Name) ? x.Account : x.Name);
     }
 
@@ -33,7 +30,7 @@ internal sealed class ApproveActorDirectory(
         }
 
         var wanted = positionIds.ToHashSet();
-        var positions = await positionService.GetEnabledListAsync();
+        var positions = await orgDirectory.ListEnabledPositionsAsync(cancellationToken);
         return positions
             .Where(x => wanted.Contains(x.Id))
             .ToDictionary(x => x.Id, x => x.Name);
@@ -50,8 +47,8 @@ internal sealed class ApproveActorDirectory(
         }
 
         var wanted = deptIds.ToHashSet();
-        var orgs = await organizationService.GetEnabledListAsync();
-        return orgs
+        var depts = await orgDirectory.ListEnabledDeptsAsync(cancellationToken);
+        return depts
             .Where(x => wanted.Contains(x.Id))
             .ToDictionary(x => x.Id, x => x.Name);
     }

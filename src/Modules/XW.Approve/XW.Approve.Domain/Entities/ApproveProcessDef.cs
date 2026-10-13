@@ -1,10 +1,10 @@
 ﻿using XW.Approve.Domain.Constants;
-using XW.Infra.Repository;
+using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Entities;
 
 /// <summary>流程定义。按版本冻结，实例绑定 Id。P0 只读配置，不是运行时聚合根。</summary>
-public class ApproveProcessDef : EfFullAuditEntity
+public class ApproveProcessDef : FullAuditEntity
 {
     /// <summary>流程编码最大长度。</summary>
     public static readonly int ProcessKeyMaxLength = 64;

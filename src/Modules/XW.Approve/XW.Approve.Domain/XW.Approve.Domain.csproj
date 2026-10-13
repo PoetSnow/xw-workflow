@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.IdGenerater\XW.Infra.IdGenerater.csproj" />
-    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Repository\XW.Infra.Repository.csproj" />
     <ProjectReference Include="..\..\..\Shared\XW.Shared.Domain\XW.Shared.Domain.csproj" />
   </ItemGroup>
 

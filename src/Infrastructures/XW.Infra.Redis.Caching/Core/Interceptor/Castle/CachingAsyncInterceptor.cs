@@ -2,6 +2,7 @@ using Castle.DynamicProxy;
 using Microsoft.Extensions.Logging;
 using Polly;
 using System.Reflection;
+using XW.Shared.Interception;
 
 namespace XW.Infra.Redis.Caching.Core.Interceptor.Castle;
 

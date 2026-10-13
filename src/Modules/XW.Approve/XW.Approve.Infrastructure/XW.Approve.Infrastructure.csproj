@@ -12,7 +12,6 @@
     <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Repository.EfCore\XW.Infra.Repository.EfCore.csproj" />
     <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Repository\XW.Infra.Repository.csproj" />
     <ProjectReference Include="..\..\..\Shared\XW.Shared.Application\XW.Shared.Application.csproj" />
-    <ProjectReference Include="..\..\XW.System\XW.System.Application.Contracts\XW.System.Application.Contracts.csproj" />
     <ProjectReference Include="..\XW.Approve.Application.Contracts\XW.Approve.Application.Contracts.csproj" />
     <ProjectReference Include="..\XW.Approve.Domain\XW.Approve.Domain.csproj" />
   </ItemGroup>

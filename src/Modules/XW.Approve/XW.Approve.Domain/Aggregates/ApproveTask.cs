@@ -1,7 +1,6 @@
 ﻿using XW.Approve.Domain.Constants;
 using XW.Approve.Domain.Exceptions;
 using XW.Approve.Domain.Models;
-using XW.Infra.IdGenerater.Yitter;
 using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Aggregates;
@@ -64,12 +63,12 @@ public class ApproveTask : DomainEntity
     {
     }
 
-    /// <summary>按解析结果创建任务。arrived 为当前环时才是待办。</summary>
-    internal static ApproveTask Create(ApproveInstanceNode node, ResolvedAssignee assignee, bool arrived, string taskType)
+    /// <summary>按解析结果创建任务。arrived 为当前环时才是待办。id 由调用方生成。</summary>
+    internal static ApproveTask Create(ApproveInstanceNode node, ResolvedAssignee assignee, bool arrived, string taskType, long id)
     {
         return new ApproveTask
         {
-            Id = IdGenerater.GetNextId(),
+            Id = id,
             InstanceId = node.InstanceId,
             InstanceNodeId = node.Id,
             AssigneeUserId = assignee.UserId,

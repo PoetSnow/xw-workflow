@@ -1,9 +1,9 @@
-﻿using XW.Infra.Repository;
+﻿using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Entities;
 
 /// <summary>业务与流程版本绑定。条件命中后选用具体 ProcessDef 版本。</summary>
-public class ApproveProcessBinding : EfFullAuditEntity
+public class ApproveProcessBinding : FullAuditEntity
 {
     /// <summary>业务类型最大长度。</summary>
     public static readonly int BusinessTypeMaxLength = 32;

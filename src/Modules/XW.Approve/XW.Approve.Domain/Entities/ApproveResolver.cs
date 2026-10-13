@@ -1,9 +1,9 @@
-﻿using XW.Infra.Repository;
+﻿using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Entities;
 
 /// <summary>审批人解析规则。类型见 ApproveResolverType。</summary>
-public class ApproveResolver : EfFullAuditEntity
+public class ApproveResolver : FullAuditEntity
 {
     /// <summary>解析类型最大长度。</summary>
     public static readonly int ResolverTypeMaxLength = 32;

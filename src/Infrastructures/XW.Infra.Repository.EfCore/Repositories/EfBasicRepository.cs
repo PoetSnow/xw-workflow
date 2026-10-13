@@ -8,7 +8,7 @@ namespace XW.Infra.Repository.EfCore;
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 public class EfBasicRepository<TEntity>(DbContext dbContext) : AbstractEfBaseRepository<DbContext, TEntity>(dbContext), IEfBasicRepository<TEntity>
-        where TEntity : Entity, IEfEntity<long>
+        where TEntity : class, XW.Shared.Domain.Entities.IEntity<long>
 {
     public virtual async Task<int> RemoveAsync(TEntity entity, CancellationToken cancellationToken = default)
     {

@@ -1,9 +1,9 @@
-﻿using XW.Infra.Repository;
+﻿using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Entities;
 
 /// <summary>流程连线。XOR：按 Priority 第一条命中，否则走 IsDefault。</summary>
-public class ApproveProcessTransition : EfFullAuditEntity
+public class ApproveProcessTransition : FullAuditEntity
 {
     /// <summary>连线名称最大长度。</summary>
     public static readonly int NameMaxLength = 128;

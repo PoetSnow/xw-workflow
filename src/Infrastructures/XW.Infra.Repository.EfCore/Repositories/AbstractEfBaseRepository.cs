@@ -10,7 +10,7 @@ namespace XW.Infra.Repository.EfCore;
 /// <typeparam name="TEntity"></typeparam>
 public abstract class AbstractEfBaseRepository<TDbContext, TEntity>(TDbContext dbContext) : IEfBaseRepository<TEntity>
    where TDbContext : DbContext
-   where TEntity : Entity, IEfEntity<long>
+   where TEntity : class, XW.Shared.Domain.Entities.IEntity<long>
 {
     protected virtual TDbContext DbContext { get; } = dbContext;
 
@@ -94,7 +94,7 @@ public abstract class AbstractEfBaseRepository<TDbContext, TEntity>(TDbContext d
         => GetDbSet<TEntity>(writeDb, noTracking);
 
     protected virtual IQueryable<TSource> GetDbSet<TSource>(bool writeDb, bool noTracking)
-        where TSource : Entity, IEfEntity<long>
+        where TSource : class, XW.Shared.Domain.Entities.IEntity<long>
     {
         if (noTracking && writeDb)
         {

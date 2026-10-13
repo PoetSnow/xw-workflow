@@ -1,6 +1,6 @@
 namespace XW.Infra.Caching.Interceptor
 {
-    using XW.Infra.Redis.Caching.Core.Interceptor;
+    using XW.Shared.Interception;
     using System;
 
     /// <summary>

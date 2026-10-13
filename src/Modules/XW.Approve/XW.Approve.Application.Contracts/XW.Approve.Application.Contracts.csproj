@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.Repository\XW.Infra.Repository.csproj" />
     <ProjectReference Include="..\..\..\Shared\XW.Shared.Application.Contracts\XW.Shared.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Shared\XW.Shared.Interception\XW.Shared.Interception.csproj" />
   </ItemGroup>
 
 </Project>

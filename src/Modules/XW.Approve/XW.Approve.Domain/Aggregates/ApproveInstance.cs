@@ -3,7 +3,6 @@ using XW.Approve.Domain.Entities;
 using XW.Approve.Domain.Exceptions;
 using XW.Approve.Domain.Models;
 using XW.Approve.Domain.Rules;
-using XW.Infra.IdGenerater.Yitter;
 using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Aggregates;
@@ -85,7 +84,8 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         long submitDeptId,
         string formSnapshot,
         ProcessRuntimeGraph graph,
-        AssigneeResolveContext org)
+        AssigneeResolveContext org,
+        Func<long> nextId)
     {
         if (processDefId <= 0)
         {
@@ -114,10 +114,11 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
 
         ArgumentNullException.ThrowIfNull(graph);
         ArgumentNullException.ThrowIfNull(org);
+        ArgumentNullException.ThrowIfNull(nextId);
 
         var instance = new ApproveInstance
         {
-            Id = IdGenerater.GetNextId(),
+            Id = nextId(),
             ProcessDefId = processDefId,
             BusinessType = businessType.Trim(),
             BusinessId = businessId.Trim(),
@@ -135,7 +136,7 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         foreach (var def in path)
         {
             var arrived = ProcessRuntimeGraph.IsWork(def) && firstWorkPending;
-            var node = instance.MaterializeNode(def, graph, org, arrived);
+            var node = instance.MaterializeNode(def, graph, org, arrived, nextId);
             if (ProcessRuntimeGraph.IsStart(def))
             {
                 startNode = node;
@@ -148,6 +149,7 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         }
 
         instance.AppendHistory(
+            nextId,
             submitUserId,
             ApproveHistoryAction.Submit,
             comment: title,
@@ -173,25 +175,28 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         long userId,
         string comment,
         ProcessRuntimeGraph graph,
-        AssigneeResolveContext org)
+        AssigneeResolveContext org,
+        Func<long> nextId)
     {
         EnsureRunning();
         ArgumentNullException.ThrowIfNull(graph);
         ArgumentNullException.ThrowIfNull(org);
+        ArgumentNullException.ThrowIfNull(nextId);
 
         var task = RequirePendingTask(taskId, userId);
         EnsureTaskType(task, ApproveTaskType.Approve, "当前环节不是审批");
         task.Complete(comment, ApproveHistoryAction.Approve);
 
         var node = RequireNode(task.InstanceNodeId);
-        AppendHistory(userId, ApproveHistoryAction.Approve, comment, node.Id, task.Id);
-        AdvanceIfPassed(node, userId);
+        AppendHistory(nextId, userId, ApproveHistoryAction.Approve, comment, node.Id, task.Id);
+        AdvanceIfPassed(node, userId, nextId);
     }
 
     /// <summary>驳回。一票否决，直接结束实例。</summary>
-    public void Reject(long taskId, long userId, string comment)
+    public void Reject(long taskId, long userId, string comment, Func<long> nextId)
     {
         EnsureRunning();
+        ArgumentNullException.ThrowIfNull(nextId);
 
         var task = RequirePendingTask(taskId, userId);
         EnsureTaskType(task, ApproveTaskType.Approve, "当前环节不能驳回");
@@ -201,14 +206,15 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         CancelPendingOf(node, "节点已驳回，其余待办取消");
         node.MarkRejected();
         CancelNotReached("节点已驳回，后续环节取消");
-        AppendHistory(userId, ApproveHistoryAction.Reject, comment, node.Id, task.Id);
+        AppendHistory(nextId, userId, ApproveHistoryAction.Reject, comment, node.Id, task.Id);
         Finish(ApproveInstanceStatus.Rejected);
     }
 
     /// <summary>协作或任务完成。全员完成后才往下。</summary>
-    public void Complete(long taskId, long userId, string? payloadJson, string? schemaJson, int attachmentCount)
+    public void Complete(long taskId, long userId, string? payloadJson, string? schemaJson, int attachmentCount, Func<long> nextId)
     {
         EnsureRunning();
+        ArgumentNullException.ThrowIfNull(nextId);
 
         var task = RequirePendingTask(taskId, userId);
         EnsureTaskType(task, ApproveTaskType.Complete, "当前环节不是协作或任务");
@@ -216,28 +222,30 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         task.Complete(string.Empty, ApproveHistoryAction.Complete, payload);
 
         var node = RequireNode(task.InstanceNodeId);
-        AppendHistory(userId, ApproveHistoryAction.Complete, comment: null, node.Id, task.Id, snapshot: payload);
-        AdvanceIfPassed(node, userId);
+        AppendHistory(nextId, userId, ApproveHistoryAction.Complete, comment: null, node.Id, task.Id, snapshot: payload);
+        AdvanceIfPassed(node, userId, nextId);
     }
 
     /// <summary>知会已读。全员已读后才往下。</summary>
-    public void MarkRead(long taskId, long userId)
+    public void MarkRead(long taskId, long userId, Func<long> nextId)
     {
         EnsureRunning();
+        ArgumentNullException.ThrowIfNull(nextId);
 
         var task = RequirePendingTask(taskId, userId);
         EnsureTaskType(task, ApproveTaskType.Read, "当前环节不是知会");
         task.Complete(string.Empty, ApproveHistoryAction.Read);
 
         var node = RequireNode(task.InstanceNodeId);
-        AppendHistory(userId, ApproveHistoryAction.Read, comment: null, node.Id, task.Id);
-        AdvanceIfPassed(node, userId);
+        AppendHistory(nextId, userId, ApproveHistoryAction.Read, comment: null, node.Id, task.Id);
+        AdvanceIfPassed(node, userId, nextId);
     }
 
     /// <summary>撤销。仅发起人可调用。</summary>
-    public void Cancel(long userId, string comment)
+    public void Cancel(long userId, string comment, Func<long> nextId)
     {
         EnsureRunning();
+        ArgumentNullException.ThrowIfNull(nextId);
         if (userId != SubmitUserId)
         {
             throw new ApprovalDomainException("仅发起人可撤销");
@@ -255,7 +263,7 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
             node.MarkCancelled();
         }
 
-        AppendHistory(userId, ApproveHistoryAction.Cancel, comment, CurrentNodeId);
+        AppendHistory(nextId, userId, ApproveHistoryAction.Cancel, comment, CurrentNodeId);
         Finish(ApproveInstanceStatus.Cancelled);
     }
 
@@ -263,11 +271,13 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
     public bool SyncSnapshotAndPendingPath(
         string snapshot,
         ProcessRuntimeGraph graph,
-        AssigneeResolveContext org)
+        AssigneeResolveContext org,
+        Func<long> nextId)
     {
         EnsureRunning();
         ArgumentNullException.ThrowIfNull(graph);
         ArgumentNullException.ThrowIfNull(org);
+        ArgumentNullException.ThrowIfNull(nextId);
 
         var changed = false;
         if (!string.IsNullOrWhiteSpace(snapshot)
@@ -277,7 +287,7 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
             changed = true;
         }
 
-        return RebuildPendingTail(graph, org) || changed;
+        return RebuildPendingTail(graph, org, nextId) || changed;
     }
 
     /// <summary>提交时按快照走出唯一路径。</summary>
@@ -331,7 +341,7 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         throw new ApprovalDomainException("流程没有结束节点，或推进超过最大跳转次数");
     }
 
-    private bool RebuildPendingTail(ProcessRuntimeGraph graph, AssigneeResolveContext org)
+    private bool RebuildPendingTail(ProcessRuntimeGraph graph, AssigneeResolveContext org, Func<long> nextId)
     {
         var current = CurrentNodeId is long id
             ? RequireNode(id)
@@ -365,7 +375,7 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
 
         foreach (var def in expected)
         {
-            MaterializeNode(def, graph, org, arrived: false);
+            MaterializeNode(def, graph, org, arrived: false, nextId);
         }
 
         return true;
@@ -376,9 +386,10 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         ApproveProcessNode def,
         ProcessRuntimeGraph graph,
         AssigneeResolveContext org,
-        bool arrived)
+        bool arrived,
+        Func<long> nextId)
     {
-        var node = ApproveInstanceNode.CreateFromDef(def, Id, arrived);
+        var node = ApproveInstanceNode.CreateFromDef(def, Id, arrived, nextId());
         Nodes.Add(node);
 
         if (ProcessRuntimeGraph.IsStart(def))
@@ -402,7 +413,7 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         var taskType = ApproveTaskType.ForNode(def.NodeType);
         foreach (var assignee in assignees)
         {
-            Tasks.Add(ApproveTask.Create(node, assignee, arrived, taskType));
+            Tasks.Add(ApproveTask.Create(node, assignee, arrived, taskType, nextId()));
         }
 
         if (arrived)
@@ -503,12 +514,12 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         Nodes.FirstOrDefault(n => n.Id == nodeId)
         ?? throw new ApprovalDomainException("实例节点不存在");
 
-    private void SkipPendingOf(ApproveInstanceNode node, long operatorUserId, string comment)
+    private void SkipPendingOf(ApproveInstanceNode node, long operatorUserId, string comment, Func<long> nextId)
     {
         foreach (var pending in NodePassEvaluator.PendingTasks(node, Tasks))
         {
             pending.Skip(comment);
-            AppendHistory(operatorUserId, ApproveHistoryAction.Skip, comment, node.Id, pending.Id);
+            AppendHistory(nextId, operatorUserId, ApproveHistoryAction.Skip, comment, node.Id, pending.Id);
         }
     }
 
@@ -520,14 +531,14 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         }
     }
 
-    private void RejectNodeAndInstance(ApproveInstanceNode node, long userId, string comment)
+    private void RejectNodeAndInstance(ApproveInstanceNode node, long userId, string comment, Func<long> nextId)
     {
         node.MarkRejected();
-        AppendHistory(userId, ApproveHistoryAction.Reject, comment, node.Id);
+        AppendHistory(nextId, userId, ApproveHistoryAction.Reject, comment, node.Id);
         Finish(ApproveInstanceStatus.Rejected);
     }
 
-    private void AdvanceIfPassed(ApproveInstanceNode node, long userId)
+    private void AdvanceIfPassed(ApproveInstanceNode node, long userId, Func<long> nextId)
     {
         if (!NodePassEvaluator.IsPassed(node, Tasks))
         {
@@ -536,11 +547,11 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
                 return;
             }
 
-            RejectNodeAndInstance(node, userId, "未达到节点通过条件");
+            RejectNodeAndInstance(node, userId, "未达到节点通过条件", nextId);
             return;
         }
 
-        SkipPendingOf(node, userId, "节点已通过，其余待办跳过");
+        SkipPendingOf(node, userId, "节点已通过，其余待办跳过", nextId);
         node.MarkApproved();
         AdvanceAlongPath(node);
     }
@@ -554,6 +565,7 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
     }
 
     private void AppendHistory(
+        Func<long> nextId,
         long operatorUserId,
         string action,
         string? comment,
@@ -562,6 +574,7 @@ public class ApproveInstance : AggregateRootWithFullAuditInfo
         string? snapshot = null)
     {
         Histories.Add(ApproveHistory.Append(
+            nextId(),
             Id,
             operatorUserId,
             action,

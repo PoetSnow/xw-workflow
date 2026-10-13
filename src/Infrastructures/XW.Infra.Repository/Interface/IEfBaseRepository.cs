@@ -7,7 +7,7 @@ namespace XW.Infra.Repository;
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 public interface IEfBaseRepository<TEntity> : IRepository<TEntity>
-           where TEntity : Entity, IEfEntity<long>
+           where TEntity : class, XW.Shared.Domain.Entities.IEntity<long>
 {
     /// <summary>
     /// Inserts a single entity.

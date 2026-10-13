@@ -1,10 +1,10 @@
 ﻿using XW.Approve.Domain.Constants;
-using XW.Infra.Repository;
+using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Entities;
 
 /// <summary>条件项。值类型见 ApproveValueType。</summary>
-public class ApproveConditionItem : EfFullAuditEntity
+public class ApproveConditionItem : FullAuditEntity
 {
     /// <summary>字段键最大长度。</summary>
     public static readonly int FieldKeyMaxLength = 64;

@@ -1,10 +1,10 @@
 ﻿using XW.Approve.Domain.Constants;
-using XW.Infra.Repository;
+using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Entities;
 
 /// <summary>审批条件用的业务字段定义。界面用 FieldName，引擎用 FieldKey 读表单快照。</summary>
-public class ApproveBusinessField : EfFullAuditEntity
+public class ApproveBusinessField : FullAuditEntity
 {
     /// <summary>业务类型最大长度。</summary>
     public static readonly int BusinessTypeMaxLength = 32;

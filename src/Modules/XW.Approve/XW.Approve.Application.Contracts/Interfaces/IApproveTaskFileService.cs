@@ -1,5 +1,5 @@
 using XW.Approve.Application.Contracts.Dtos;
-using XW.Infra.Repository.Interceptor;
+using XW.Shared.Interception;
 
 namespace XW.Approve.Application.Contracts.Interfaces;
 

@@ -1,14 +1,6 @@
 namespace XW.Infra.Repository;
 
-public interface IFullAuditInfo : IBasicAuditInfo
+/// <summary>创建与修改审计。成员定义在 <see cref="XW.Shared.Domain.Entities.IFullAuditInfo"/>。</summary>
+public interface IFullAuditInfo : IBasicAuditInfo, XW.Shared.Domain.Entities.IFullAuditInfo
 {
-    /// <summary>
-    /// Last updater
-    /// </summary>
-    public long ModifyBy { get; set; }
-
-    /// <summary>
-    /// Last update time
-    /// </summary>
-    public DateTime ModifyTime { get; set; }
 }

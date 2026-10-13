@@ -103,7 +103,7 @@ public static class ModuleDbContextRegistrationExtension
         this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TDbContext : DbContext
-        where TEntity : Entity, IEfEntity<long>
+        where TEntity : class, XW.Shared.Domain.Entities.IEntity<long>
     {
         var repositoryInterface = typeof(IEfBasicRepository<>).MakeGenericType(typeof(TEntity));
         if (services.Any(descriptor => descriptor.ServiceType == repositoryInterface))

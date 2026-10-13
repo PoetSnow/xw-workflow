@@ -1,4 +1,5 @@
 using System.Data;
+using XW.Shared.Interception;
 
 namespace XW.Infra.Repository;
 
@@ -13,7 +14,7 @@ public interface IModuleUnitOfWork : IAsyncDisposable
 {
     /// <summary>
     /// 当前请求作用域内是否已开启模块事务（<c>BeginAsync</c> 之后、<c>Commit/Rollback</c> 之前为 <c>true</c>）。
-    /// 用于拦截器识别嵌套 <see cref="Interceptor.UnitOfWorkAttribute"/> 调用，避免重复 Begin/Commit。
+    /// 用于拦截器识别嵌套 <see cref="UnitOfWorkAttribute"/> 调用，避免重复 Begin/Commit。
     /// </summary>
     bool IsActive { get; }
 

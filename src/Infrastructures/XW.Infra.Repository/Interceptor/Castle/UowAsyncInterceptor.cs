@@ -2,7 +2,7 @@ using Castle.DynamicProxy;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using XW.Infra.Repository;
-using XW.Infra.Repository.Interceptor;
+using XW.Shared.Interception;
 
 namespace XW.Infra.Repository.Interceptor.Castle;
 

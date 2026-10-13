@@ -8,7 +8,7 @@ namespace XW.Infra.Repository;
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 public interface IEfBasicRepository<TEntity> : IEfBaseRepository<TEntity>
-           where TEntity : Entity, IEfEntity<long>
+           where TEntity : class, XW.Shared.Domain.Entities.IEntity<long>
 {
     Task<int> RemoveAsync(TEntity entity, CancellationToken cancellationToken = default);
 

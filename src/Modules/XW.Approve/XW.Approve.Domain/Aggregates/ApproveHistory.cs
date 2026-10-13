@@ -1,5 +1,4 @@
-﻿using XW.Infra.IdGenerater.Yitter;
-using XW.Shared.Domain.Entities;
+﻿using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Aggregates;
 
@@ -40,8 +39,9 @@ public class ApproveHistory : DomainEntity
     {
     }
 
-    /// <summary>追加一条历史。</summary>
+    /// <summary>追加一条历史。id 由调用方生成。</summary>
     internal static ApproveHistory Append(
+        long id,
         long instanceId,
         long operatorUserId,
         string action,
@@ -52,7 +52,7 @@ public class ApproveHistory : DomainEntity
     {
         return new ApproveHistory
         {
-            Id = IdGenerater.GetNextId(),
+            Id = id,
             InstanceId = instanceId,
             InstanceNodeId = instanceNodeId,
             TaskId = taskId,

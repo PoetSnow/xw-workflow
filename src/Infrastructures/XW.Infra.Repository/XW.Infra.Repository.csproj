@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\XW.Shared.Domain\XW.Shared.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\XW.Shared.Interception\XW.Shared.Interception.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Castle.Core.AsyncInterceptor" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational"  />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />

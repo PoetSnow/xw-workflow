@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using MySqlConnector;
 using XW.Approve.Infrastructure.Persistence;
 using XW.Infra.Repository;
+using XW.Shared.Interception;
 
 namespace XW.Host.API.Infrastructure;
 

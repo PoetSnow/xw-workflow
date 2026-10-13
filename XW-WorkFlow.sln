@@ -1,3 +1,4 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.10.12210.168
@@ -57,8 +58,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XW.AppHost", "src\Aspire\XW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XW.Shared.Pot", "src\Shared\XW.Shared.Pot\XW.Shared.Pot.csproj", "{6BD83A83-4655-465F-99FD-7D8C00434F25}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{DCB6FCB8-FF92-AC57-0842-1F72A354D6B1}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XW.Approve", "XW.Approve", "{DB0E67F4-EF10-46B8-91F5-EE2974E0A487}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XW.Approve.Infrastructure", "src\Modules\XW.Approve\XW.Approve.Infrastructure\XW.Approve.Infrastructure.csproj", "{F5FC8CFA-F6F9-4236-9CF3-DC0722185ED9}"
@@ -90,6 +89,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XW.Infra.Repository.EfCore.MySql", "src\Infrastructures\XW.Infra.Repository.EfCore.MySql\XW.Infra.Repository.EfCore.MySql.csproj", "{09FEF0C1-0F09-71EA-4AB2-55C27DF3B33E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XW.Infra.Repository.EfCore.SqlServer", "src\Infrastructures\XW.Infra.Repository.EfCore.SqlServer\XW.Infra.Repository.EfCore.SqlServer.csproj", "{08DE193E-559A-7406-E8D8-A35B1E37F5C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XW.Shared.Interception", "src\Shared\XW.Shared.Interception\XW.Shared.Interception.csproj", "{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -497,6 +498,18 @@ Global
 		{08DE193E-559A-7406-E8D8-A35B1E37F5C4}.Release|x64.Build.0 = Release|Any CPU
 		{08DE193E-559A-7406-E8D8-A35B1E37F5C4}.Release|x86.ActiveCfg = Release|Any CPU
 		{08DE193E-559A-7406-E8D8-A35B1E37F5C4}.Release|x86.Build.0 = Release|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Debug|x64.Build.0 = Debug|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Debug|x86.Build.0 = Debug|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Release|x64.ActiveCfg = Release|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Release|x64.Build.0 = Release|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Release|x86.ActiveCfg = Release|Any CPU
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -537,6 +550,7 @@ Global
 		{CA970CC2-3EDA-B047-EFF4-4E9724D576ED} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{09FEF0C1-0F09-71EA-4AB2-55C27DF3B33E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{08DE193E-559A-7406-E8D8-A35B1E37F5C4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{854E0AB3-3B9B-4BAC-9EB2-4E6F4360C43A} = {057D51BC-860A-4F6F-86A7-7014364C2680}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {18DBD3F6-1512-4869-8C4E-7E3C09789589}

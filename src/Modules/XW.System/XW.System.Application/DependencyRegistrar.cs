@@ -1,3 +1,5 @@
+using XW.Shared.Application.Contracts.Integrations;
+using XW.System.Application.Services;
 using XW.System.Repository;
 
 namespace XW.System.Application;
@@ -17,5 +19,6 @@ public sealed class DependencyRegistrar(IServiceCollection services, IServiceInf
     {
         AddModuleMySqlDbContext<SystemDbContext, EntityInfo>(registerDefaultUnitOfWork: true);
         AddModuleApplicationServices();
+        services.AddScoped<IOrgDirectory, OrgDirectory>();
     }
 }

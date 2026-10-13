@@ -1,9 +1,9 @@
-﻿using XW.Infra.Repository;
+﻿using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Entities;
 
 /// <summary>流程节点定义。节点类型见 ApproveNodeType。</summary>
-public class ApproveProcessNode : EfFullAuditEntity
+public class ApproveProcessNode : FullAuditEntity
 {
     /// <summary>节点编码最大长度。</summary>
     public static readonly int NodeKeyMaxLength = 64;

@@ -82,7 +82,8 @@ public sealed class ApproveInstanceService(
                 deptId,
                 snapshot,
                 graph,
-                org);
+                org,
+                IdGenerater.GetNextId);
 
             await instanceRepository.InsertAsync(instance);
             await NotifyIfCompletedAsync(instance);
@@ -109,7 +110,7 @@ public sealed class ApproveInstanceService(
                 ?? throw new ApprovalDomainException("流程定义不存在");
             var org = await orgSnapshotReader.LoadAsync();
 
-            instance.Approve(taskId, userId, input.Comment, graph, org);
+            instance.Approve(taskId, userId, input.Comment, graph, org, IdGenerater.GetNextId);
             await instanceRepository.UpdateAsync(instance);
             await NotifyIfCompletedAsync(instance);
             return ServiceResult();
@@ -131,7 +132,7 @@ public sealed class ApproveInstanceService(
             var instance = await instanceRepository.GetByTaskIdForWriteAsync(taskId)
                 ?? throw new ApprovalDomainException("任务不存在");
 
-            instance.Reject(taskId, userId, input.Comment);
+            instance.Reject(taskId, userId, input.Comment, IdGenerater.GetNextId);
             await instanceRepository.UpdateAsync(instance);
             await NotifyIfCompletedAsync(instance);
             return ServiceResult();
@@ -158,7 +159,7 @@ public sealed class ApproveInstanceService(
             var node = instance.Nodes.First(n => n.Id == task.InstanceNodeId);
             var schema = FormSchemaSelector.ForTask(graph, node.ProcessNodeId, task, instance.SubmitUserId, org);
             var count = await taskFiles.CountByTaskAsync(taskId);
-            instance.Complete(taskId, userId, ReadPayload(input.Payload), schema, count);
+            instance.Complete(taskId, userId, ReadPayload(input.Payload), schema, count, IdGenerater.GetNextId);
             await instanceRepository.UpdateAsync(instance);
             await NotifyIfCompletedAsync(instance);
             return ServiceResult();
@@ -177,7 +178,7 @@ public sealed class ApproveInstanceService(
             var userId = RequireUserId();
             var instance = await instanceRepository.GetByTaskIdForWriteAsync(taskId)
                 ?? throw new ApprovalDomainException("任务不存在");
-            instance.MarkRead(taskId, userId);
+            instance.MarkRead(taskId, userId, IdGenerater.GetNextId);
             await instanceRepository.UpdateAsync(instance);
             await NotifyIfCompletedAsync(instance);
             return ServiceResult();
@@ -199,7 +200,7 @@ public sealed class ApproveInstanceService(
             var instance = await instanceRepository.GetForWriteAsync(instanceId)
                 ?? throw new ApprovalDomainException("审批实例不存在");
 
-            instance.Cancel(userId, input.Comment);
+            instance.Cancel(userId, input.Comment, IdGenerater.GetNextId);
             await instanceRepository.UpdateAsync(instance);
             await NotifyIfCompletedAsync(instance);
             return ServiceResult();
@@ -324,7 +325,7 @@ public sealed class ApproveInstanceService(
 
             var org = await orgSnapshotReader.LoadAsync();
             var snapshot = await BindSnapshotAsync(tracked.BusinessType, tracked.BusinessId, tracked.SubmitDeptId);
-            if (tracked.SyncSnapshotAndPendingPath(snapshot, graph, org))
+            if (tracked.SyncSnapshotAndPendingPath(snapshot, graph, org, IdGenerater.GetNextId))
             {
                 await instanceRepository.UpdateAsync(tracked);
             }

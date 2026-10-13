@@ -1,6 +1,5 @@
 ﻿using XW.Approve.Domain.Constants;
 using XW.Approve.Domain.Entities;
-using XW.Infra.IdGenerater.Yitter;
 using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Aggregates;
@@ -63,13 +62,13 @@ public class ApproveInstanceNode : DomainEntity
     {
     }
 
-    /// <summary>按流程定义节点生成运行时快照。arrived 为当前环。</summary>
-    internal static ApproveInstanceNode CreateFromDef(ApproveProcessNode def, long instanceId, bool arrived)
+    /// <summary>按流程定义节点生成运行时快照。arrived 为当前环。id 由调用方生成。</summary>
+    internal static ApproveInstanceNode CreateFromDef(ApproveProcessNode def, long instanceId, bool arrived, long id)
     {
         var now = DateTime.Now;
         return new ApproveInstanceNode
         {
-            Id = IdGenerater.GetNextId(),
+            Id = id,
             InstanceId = instanceId,
             ProcessNodeId = def.Id,
             NodeKey = def.NodeKey,

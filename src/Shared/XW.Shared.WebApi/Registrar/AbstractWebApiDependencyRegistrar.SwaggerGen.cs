@@ -135,8 +135,8 @@ public abstract partial class AbstractWebApiDependencyRegistrar
             return type.FullName?.Replace('+', '.') ?? name;
         }
 
-        var secondDot = ns.IndexOf('.', 5);
-        var module = secondDot > 0 ? ns[5..secondDot] : ns[5..];
+        var secondDot = ns.IndexOf('.', 3);
+        var module = secondDot > 0 ? ns[3..secondDot] : ns[3..];
         return $"{module}.{name}";
     }
 

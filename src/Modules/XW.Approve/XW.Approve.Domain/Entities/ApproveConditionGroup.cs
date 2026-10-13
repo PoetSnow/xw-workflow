@@ -1,10 +1,10 @@
 ﻿using XW.Approve.Domain.Constants;
-using XW.Infra.Repository;
+using XW.Shared.Domain.Entities;
 
 namespace XW.Approve.Domain.Entities;
 
 /// <summary>条件组。OwnerType 见 ApproveConditionOwner，支持 And / Or 嵌套。</summary>
-public class ApproveConditionGroup : EfFullAuditEntity
+public class ApproveConditionGroup : FullAuditEntity
 {
     /// <summary>归属类型最大长度。</summary>
     public static readonly int OwnerTypeMaxLength = 16;

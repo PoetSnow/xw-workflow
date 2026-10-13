@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using XW.Shared.Interception;
 
 namespace XW.Infra.Redis.Caching.Core.Interceptor;
 
