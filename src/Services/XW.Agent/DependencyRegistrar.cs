@@ -68,15 +68,7 @@ public static class AgentServiceCollectionExtensions
         services.AddHttpClient(HttpIntegrationGateway.HttpClientName);
         services.AddSingleton<IIntegrationGateway, HttpIntegrationGateway>();
 
-        // Knowledge / RAG：开关控制；仅 vector，关闭则跳过，不回退词法
-        services.AddSingleton<IKnowledgeStore, FileKnowledgeStore>();
-        services.AddSingleton<PlainTextDocumentExtractor>();
-        services.AddSingleton<UnsupportedBinaryDocumentExtractor>();
-        services.AddSingleton<IDocumentTextExtractor>(sp => new CompositeDocumentTextExtractor(
-        [
-            sp.GetRequiredService<PlainTextDocumentExtractor>(),
-            sp.GetRequiredService<UnsupportedBinaryDocumentExtractor>()
-        ]));
+        // 会话、审计、轮次仍用这份连接。向量检索在 Infrastructure。
         services.AddSingleton<KnowledgePgDataSource>();
         services.AddSingleton<PgAgentAuditStore>();
         services.AddSingleton<IAgentAuditStore>(sp =>
@@ -111,20 +103,6 @@ public static class AgentServiceCollectionExtensions
 
             return sp.GetRequiredService<PgAgentTurnStore>();
         });
-        services.AddSingleton<IKnowledgeVectorStore, PgVectorKnowledgeStore>();
-        services.AddHttpClient(OpenAiCompatibleEmbeddingClient.HttpClientName, (sp, client) =>
-        {
-            var seconds = sp.GetRequiredService<IOptionsMonitor<AgentOptions>>()
-                .CurrentValue.Knowledge.Embedding.TimeoutSeconds;
-            client.Timeout = TimeSpan.FromSeconds(seconds <= 0 ? 60 : seconds);
-        });
-        services.AddSingleton<IEmbeddingClient, OpenAiCompatibleEmbeddingClient>();
-        services.AddSingleton<IKnowledgeIngestService, KnowledgeIngestService>();
-        services.AddSingleton<VectorKnowledgeRetriever>();
-        services.AddSingleton<IKnowledgeRetriever, ConfigurableKnowledgeRetriever>();
-        // FileKnowledgeStore / Lexical：仅保留 status 兼容，不再作为 Chat 检索回退
-        services.AddSingleton<LexicalKnowledgeRetriever>();
-
         // Capability 注册中心 + 动态检索 + Tooling
         services.AddSingleton<FileSkillCatalog>();
         services.AddSingleton<ICapabilityRegistry>(sp => sp.GetRequiredService<FileSkillCatalog>());

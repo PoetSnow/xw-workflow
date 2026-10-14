@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\XW.Agent\XW.Agent.Application.csproj" />
+    <ProjectReference Include="..\XW.Agent.Infrastructure\XW.Agent.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

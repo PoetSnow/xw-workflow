@@ -100,6 +100,11 @@ public sealed class LlmIntentRouter(
         {
             foreach (var (k, v) in parsed.Slots)
             {
+                if (string.Equals(k, SessionCorpus.SlotKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 if (!string.IsNullOrWhiteSpace(v))
                 {
                     mergedSlots[k] = v.Trim();

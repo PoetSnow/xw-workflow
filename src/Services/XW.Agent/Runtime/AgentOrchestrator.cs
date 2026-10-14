@@ -74,6 +74,11 @@ public sealed class AgentOrchestrator(
         turnTelemetry.Begin(traceId);
 
         var session = await sessions.GetOrCreateAsync(request.SessionId, user.UserId ?? request.UserId, ct);
+        if (request.CorpusIds is not null)
+        {
+            SessionCorpus.Write(session, request.CorpusIds);
+        }
+
         session.Messages.Add(new AgentMessage { Role = "user", Content = request.Message });
         session.Slots["_confirmed"] = user.Confirmed ? "true" : "false";
 
@@ -875,6 +880,11 @@ public sealed class AgentOrchestrator(
 
             foreach (var (k, v) in decision.Arguments)
             {
+                if (string.Equals(k, SessionCorpus.SlotKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 if (!string.IsNullOrWhiteSpace(v))
                 {
                     var value = v.Trim();

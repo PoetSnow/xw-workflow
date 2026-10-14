@@ -11,7 +11,6 @@
   "IntentCode": "search_knowledge",
   "Enabled": true,
   "Parameters": [
-    { "Name": "query", "Type": "string", "Required": true, "Description": "检索问句" },
-    { "Name": "domain", "Type": "string", "Required": false, "Description": "可选库内过滤" }
+    { "Name": "query", "Type": "string", "Required": true, "Description": "检索问句" }
   ]
 }

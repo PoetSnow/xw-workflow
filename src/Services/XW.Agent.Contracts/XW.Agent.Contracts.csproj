@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>XW.Agent.Contracts</RootNamespace>
+    <Description>Agent 底座契约。业务包只依赖此项目。</Description>
+  </PropertyGroup>
+
+</Project>

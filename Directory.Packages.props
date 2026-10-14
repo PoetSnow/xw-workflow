@@ -59,6 +59,7 @@
     <PackageVersion Include="MQTTnet" Version="4.3.7.1207" />
     <PackageVersion Include="RabbitMQ.Client" Version="7.0.0" />
     <PackageVersion Include="DotNetCore.CAP" Version="8.3.3" />
+    <PackageVersion Include="DotNetCore.CAP.PostgreSql" Version="8.3.3" />
     <PackageVersion Include="DotNetCore.CAP.Dashboard" Version="8.3.3" />
     <PackageVersion Include="DotNetCore.CAP.RabbitMQ" Version="8.3.3" />
     <PackageVersion Include="DotNetCore.CAP.MySql" Version="8.3.3" />

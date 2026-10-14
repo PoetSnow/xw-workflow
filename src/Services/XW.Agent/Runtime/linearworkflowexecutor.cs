@@ -117,6 +117,11 @@ public sealed class LinearWorkflowExecutor(
 
             foreach (var (ak, av) in args)
             {
+                if (string.Equals(ak, SessionCorpus.SlotKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 session.Slots[ak] = av;
             }
 
@@ -301,6 +306,11 @@ public sealed class LinearWorkflowExecutor(
             {
                 error = $"步骤赋值 {name} 为空";
                 return false;
+            }
+
+            if (string.Equals(name, SessionCorpus.SlotKey, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
             }
 
             vars[name] = value;

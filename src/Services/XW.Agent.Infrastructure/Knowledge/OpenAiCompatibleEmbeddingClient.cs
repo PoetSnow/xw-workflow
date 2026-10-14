@@ -3,47 +3,49 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using XW.Agent.Application.Options;
+using XW.Agent.Contracts.Knowledge;
 
-namespace XW.Agent.Application.Knowledge;
+namespace XW.Agent.Infrastructure.Knowledge;
 
-/// <summary>OpenAI 兼容 Embedding HTTP 客户端。</summary>
+/// <summary>把文本变成向量。</summary>
 public interface IEmbeddingClient
 {
-    /// <summary>单文本向量化。</summary>
-    Task<float[]> EmbedAsync(string text, CancellationToken ct = default);
+    /// <summary>单条文本。</summary>
+    Task<float[]> EmbedAsync(string text, CancellationToken cancellationToken = default);
 
-    /// <summary>批量向量化（入库切块用）。</summary>
-    Task<IReadOnlyList<float[]>> EmbedBatchAsync(IReadOnlyList<string> texts, CancellationToken ct = default);
+    /// <summary>一批文本。入库切块用。</summary>
+    Task<IReadOnlyList<float[]>> EmbedBatchAsync(
+        IReadOnlyList<string> texts,
+        CancellationToken cancellationToken = default);
 }
 
-/// <summary>OpenAI 兼容 /v1/embeddings；入库与查询必须同一 Model。</summary>
+/// <summary>OpenAI 兼容的 /v1/embeddings。</summary>
 public sealed class OpenAiCompatibleEmbeddingClient(
     IHttpClientFactory httpClientFactory,
-    IOptionsMonitor<AgentOptions> options,
+    IOptionsMonitor<EmbeddingOptions> options,
     ILogger<OpenAiCompatibleEmbeddingClient> logger) : IEmbeddingClient
 {
     /// <summary>命名 HttpClient。</summary>
     public const string HttpClientName = "xw-agent-embedding";
 
     /// <inheritdoc />
-    public async Task<float[]> EmbedAsync(string text, CancellationToken ct = default)
+    public async Task<float[]> EmbedAsync(string text, CancellationToken cancellationToken = default)
     {
-        var batch = await EmbedBatchAsync([text], ct);
+        var batch = await EmbedBatchAsync([text], cancellationToken);
         return batch[0];
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<float[]>> EmbedBatchAsync(
         IReadOnlyList<string> texts,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         if (texts.Count == 0)
         {
             return [];
         }
 
-        var cfg = options.CurrentValue.Knowledge.Embedding;
+        var cfg = options.CurrentValue;
         if (!cfg.Enabled)
         {
             throw new InvalidOperationException("Agent:Knowledge:Embedding:Enabled=false");
@@ -52,28 +54,21 @@ public sealed class OpenAiCompatibleEmbeddingClient(
         if (string.IsNullOrWhiteSpace(cfg.Endpoint) || string.IsNullOrWhiteSpace(cfg.ModelName))
         {
             throw new InvalidOperationException(
-                "请配置 Agent:Knowledge:Embedding:Endpoint 与 ModelName（OpenAI 兼容 Embeddings）。");
+                "请配置 Agent:Knowledge:Embedding:Endpoint 与 ModelName。");
         }
 
         var client = httpClientFactory.CreateClient(HttpClientName);
-        using var req = new HttpRequestMessage(
-            HttpMethod.Post,
-            Combine(cfg.Endpoint, cfg.EmbeddingsPath));
-
+        using var req = new HttpRequestMessage(HttpMethod.Post, Combine(cfg.Endpoint, cfg.EmbeddingsPath));
         if (!string.IsNullOrWhiteSpace(cfg.ApiKey))
         {
             req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", cfg.ApiKey);
         }
 
         object input = texts.Count == 1 ? texts[0] : texts.ToArray();
-        req.Content = JsonContent.Create(new
-        {
-            model = cfg.ModelName,
-            input
-        });
+        req.Content = JsonContent.Create(new { model = cfg.ModelName, input });
 
-        using var resp = await client.SendAsync(req, ct);
-        var body = await resp.Content.ReadAsStringAsync(ct);
+        using var resp = await client.SendAsync(req, cancellationToken);
+        var body = await resp.Content.ReadAsStringAsync(cancellationToken);
         if (!resp.IsSuccessStatusCode)
         {
             logger.LogWarning("Embedding HTTP {Code}: {Body}", (int)resp.StatusCode, Truncate(body, 400));
@@ -82,12 +77,10 @@ public sealed class OpenAiCompatibleEmbeddingClient(
 
         var parsed = System.Text.Json.JsonSerializer.Deserialize<EmbeddingResponse>(body)
                      ?? throw new InvalidOperationException("Embedding 响应无法解析");
-
         var vectors = parsed.Data
             .OrderBy(x => x.Index)
             .Select(x => x.Embedding ?? [])
             .ToList();
-
         if (vectors.Count != texts.Count)
         {
             throw new InvalidOperationException(
@@ -95,12 +88,12 @@ public sealed class OpenAiCompatibleEmbeddingClient(
         }
 
         var dim = cfg.Dimensions;
-        foreach (var v in vectors)
+        foreach (var vector in vectors)
         {
-            if (dim > 0 && v.Length != dim)
+            if (dim > 0 && vector.Length != dim)
             {
                 throw new InvalidOperationException(
-                    $"Embedding 维数不匹配 expect={dim} got={v.Length}；请对齐模型与 agent_knowledge_chunk.embedding。");
+                    $"Embedding 维数不匹配 expect={dim} got={vector.Length}");
             }
         }
 
@@ -110,12 +103,12 @@ public sealed class OpenAiCompatibleEmbeddingClient(
     private static string Combine(string endpoint, string path)
     {
         var root = endpoint.TrimEnd('/');
-        var p = path.StartsWith('/') ? path : "/" + path;
-        return root + p;
+        var suffix = path.StartsWith('/') ? path : "/" + path;
+        return root + suffix;
     }
 
-    private static string Truncate(string s, int max) =>
-        string.IsNullOrEmpty(s) ? string.Empty : s.Length <= max ? s : s[..max] + "...";
+    private static string Truncate(string value, int max) =>
+        string.IsNullOrEmpty(value) || value.Length <= max ? value : value[..max] + "...";
 
     private sealed class EmbeddingResponse
     {

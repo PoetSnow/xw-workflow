@@ -9,6 +9,7 @@ namespace XW.Agent.Application.Contracts;
 /// <param name="PermissionCodes">显式权限码（可含 *）。</param>
 /// <param name="AccessToken">调用方 Token，forward_caller 下游鉴权用。</param>
 /// <param name="Confirmed">高风险操作二次确认标记。</param>
+/// <param name="CorpusIds">调用方写入会话的资料集编号。模型不能改。</param>
 public sealed record AgentChatRequest(
     string? SessionId,
     string Message,
@@ -17,7 +18,8 @@ public sealed record AgentChatRequest(
     IReadOnlyList<string>? Roles,
     IReadOnlyList<string>? PermissionCodes,
     string? AccessToken,
-    bool Confirmed = false);
+    bool Confirmed = false,
+    IReadOnlyList<string>? CorpusIds = null);
 
 /// <summary>一轮对话结果。</summary>
 /// <param name="SessionId">会话 Id。</param>

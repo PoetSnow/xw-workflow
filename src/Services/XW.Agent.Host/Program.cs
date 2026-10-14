@@ -1,8 +1,10 @@
 using XW.Agent.Application;
 using XW.Agent.Host;
+using XW.Agent.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddXwAgentInfrastructure(builder.Configuration);
 builder.Services.AddXwAgentApplication(builder.Configuration);
 builder.Services.AddXwAgentTelemetry(builder.Configuration, builder.Environment);
 builder.Services.AddControllers()
