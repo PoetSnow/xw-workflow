@@ -16,6 +16,7 @@
   <ItemGroup>
     <PackageReference Include="Npgsql" />
     <PackageReference Include="Pgvector" />
+    <PackageReference Include="UglyToad.PdfPig" />
     <PackageReference Include="DotNetCore.CAP" />
     <PackageReference Include="DotNetCore.CAP.RabbitMQ" />
     <PackageReference Include="DotNetCore.CAP.PostgreSql" />

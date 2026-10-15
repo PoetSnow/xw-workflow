@@ -29,9 +29,11 @@ public static class AgentInfrastructureServiceCollectionExtensions
         });
         services.AddSingleton<IEmbeddingClient, OpenAiCompatibleEmbeddingClient>();
         services.AddSingleton<PlainTextDocumentExtractor>();
+        services.AddSingleton<PdfDocumentExtractor>();
         services.AddSingleton<UnsupportedBinaryDocumentExtractor>();
         services.AddSingleton<IDocumentTextExtractor>(sp => new CompositeDocumentTextExtractor(
         [
+            sp.GetRequiredService<PdfDocumentExtractor>(),
             sp.GetRequiredService<PlainTextDocumentExtractor>(),
             sp.GetRequiredService<UnsupportedBinaryDocumentExtractor>()
         ]));

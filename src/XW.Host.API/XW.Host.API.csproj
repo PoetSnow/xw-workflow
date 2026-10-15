@@ -25,6 +25,9 @@
     <ProjectReference Include="..\Modules\XW.Approve\XW.Approve.Infrastructure\XW.Approve.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\XW.Approve\XW.Approve.Application\XW.Approve.Application.csproj" />
     <ProjectReference Include="..\Modules\XW.Approve\XW.Approve.API\XW.Approve.API.csproj" />
+    <ProjectReference Include="..\Modules\XW.Inspection\XW.Inspection.Infrastructure\XW.Inspection.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\XW.Inspection\XW.Inspection.Application\XW.Inspection.Application.csproj" />
+    <ProjectReference Include="..\Modules\XW.Inspection\XW.Inspection.API\XW.Inspection.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>

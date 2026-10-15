@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>XW.Agent.Inspection</RootNamespace>
+    <Description>检测项作业。只依赖 Agent 契约。</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XW.Agent.Contracts\XW.Agent.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

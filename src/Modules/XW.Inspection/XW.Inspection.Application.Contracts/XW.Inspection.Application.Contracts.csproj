@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>XW.Inspection.Application.Contracts</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\XW.Shared.Application.Contracts\XW.Shared.Application.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

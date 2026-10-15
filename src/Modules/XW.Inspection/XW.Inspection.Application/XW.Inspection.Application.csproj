@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>XW.Inspection.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Infrastructures\XW.Infra.IdGenerater\XW.Infra.IdGenerater.csproj" />
+    <ProjectReference Include="..\..\..\Shared\XW.Shared.Application\XW.Shared.Application.csproj" />
+    <ProjectReference Include="..\XW.Inspection.Application.Contracts\XW.Inspection.Application.Contracts.csproj" />
+    <ProjectReference Include="..\XW.Inspection.Domain\XW.Inspection.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

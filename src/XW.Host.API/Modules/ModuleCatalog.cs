@@ -16,7 +16,8 @@ public static class ModuleCatalog
       
         typeof(XW.Approve.Infrastructure.DependencyRegistrar),
         typeof(XW.Approve.Application.DependencyRegistrar),
-       
+        typeof(XW.Inspection.Infrastructure.DependencyRegistrar),
+        typeof(XW.Inspection.Application.DependencyRegistrar),
     ];
 
     /// <summary>
@@ -26,6 +27,7 @@ public static class ModuleCatalog
     [
         typeof(XW.System.Application.DependencyRegistrar).Assembly,
         typeof(XW.Approve.Application.DependencyRegistrar).Assembly,
+        typeof(XW.Inspection.Application.DependencyRegistrar).Assembly,
     ];
 
     /// <summary>
@@ -36,5 +38,6 @@ public static class ModuleCatalog
         typeof(XW.System.API.Controllers.AccountController).Assembly,
       
         typeof(XW.Approve.API.Controllers.ApproveInstancesController).Assembly,
+        typeof(XW.Inspection.API.Controllers.InspectionRegulationsController).Assembly,
     ];
 }

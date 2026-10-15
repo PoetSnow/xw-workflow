@@ -5,6 +5,7 @@ using XW.Agent.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddXwAgentInfrastructure(builder.Configuration);
+builder.Services.AddSingleton<XW.Agent.Contracts.Jobs.IJobHandler, XW.Agent.Inspection.ListInspectionItemsHandler>();
 builder.Services.AddXwAgentApplication(builder.Configuration);
 builder.Services.AddXwAgentTelemetry(builder.Configuration, builder.Environment);
 builder.Services.AddControllers()

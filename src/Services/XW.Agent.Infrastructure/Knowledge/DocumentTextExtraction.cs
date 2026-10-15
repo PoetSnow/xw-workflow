@@ -50,7 +50,7 @@ public sealed class UnsupportedBinaryDocumentExtractor : IDocumentTextExtractor
 {
     private static readonly HashSet<string> KnownBinary = new(StringComparer.OrdinalIgnoreCase)
     {
-        ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"
+        ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"
     };
 
     /// <inheritdoc />
@@ -95,6 +95,9 @@ public sealed class CompositeDocumentTextExtractor(IEnumerable<IDocumentTextExtr
 /// <summary>按标题和段落切块。</summary>
 public static class KnowledgeTextChunker
 {
+    private static readonly Regex ClausePattern = new(
+        @"(?:^|\n)\s*(第[0-9０-９一二三四五六七八九十百零〇千]+条)",
+        RegexOptions.Multiline | RegexOptions.Compiled);
     /// <summary>把正文切成若干段。</summary>
     public static IReadOnlyList<string> Chunk(string text, int chunkSize = 700, int overlap = 80)
     {
@@ -185,4 +188,62 @@ public static class KnowledgeTextChunker
 
         return result.Where(part => part.Trim().Length >= 20).ToList();
     }
+
+    /// <summary>有「第×条」时按条切开，否则按段落切。</summary>
+    public static IReadOnlyList<KnowledgePiece> Split(string text, int chunkSize = 700, int overlap = 80)
+    {
+        var clauses = SplitClauses(text);
+        if (clauses.Count < 2)
+        {
+            return Chunk(text, chunkSize, overlap)
+                .Select(part => new KnowledgePiece(part, null))
+                .ToArray();
+        }
+
+        var pieces = new List<KnowledgePiece>();
+        foreach (var clause in clauses)
+        {
+            if (clause.Text.Length <= chunkSize)
+            {
+                pieces.Add(clause);
+                continue;
+            }
+
+            foreach (var part in Chunk(clause.Text, chunkSize, overlap))
+            {
+                pieces.Add(new KnowledgePiece(part, clause.ClauseNo));
+            }
+        }
+
+        return pieces;
+    }
+
+    private static IReadOnlyList<KnowledgePiece> SplitClauses(string text)
+    {
+        var normalized = text.Replace("\r\n", "\n").Trim();
+        var matches = ClausePattern.Matches(normalized);
+        if (matches.Count < 2)
+        {
+            return [];
+        }
+
+        var clauses = new List<KnowledgePiece>();
+        for (var i = 0; i < matches.Count; i++)
+        {
+            var start = matches[i].Index;
+            var end = i + 1 < matches.Count ? matches[i + 1].Index : normalized.Length;
+            var body = normalized[start..end].Trim();
+            if (body.Length < 20)
+            {
+                continue;
+            }
+
+            clauses.Add(new KnowledgePiece(body, matches[i].Groups[1].Value));
+        }
+
+        return clauses;
+    }
 }
+
+/// <summary>一个切块。法规按条切开时带条款号。</summary>
+public readonly record struct KnowledgePiece(string Text, string? ClauseNo);

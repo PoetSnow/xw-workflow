@@ -95,25 +95,26 @@ public sealed class KnowledgeIngestService(
                 throw new InvalidOperationException("解析后文本为空，无法入库");
             }
 
-            var pieces = KnowledgeTextChunker.Chunk(text, cfg.ChunkSize, cfg.ChunkOverlap);
+            var pieces = KnowledgeTextChunker.Split(text, cfg.ChunkSize, cfg.ChunkOverlap);
             if (pieces.Count == 0)
             {
                 throw new InvalidOperationException("切块结果为空");
             }
 
-            var vectors = await embedding.EmbedBatchAsync(pieces, cancellationToken);
+            var vectors = await embedding.EmbedBatchAsync(pieces.Select(piece => piece.Text).ToArray(), cancellationToken);
             var chunks = new List<KnowledgeChunkWriteModel>(pieces.Count);
             for (var i = 0; i < pieces.Count; i++)
             {
+                var clauseNo = pieces[i].ClauseNo;
                 chunks.Add(new KnowledgeChunkWriteModel
                 {
                     Id = $"{documentId}#{i + 1}",
                     DocumentId = documentId,
                     ChunkIndex = i + 1,
                     CorpusId = corpusId,
-                    Title = title,
+                    Title = string.IsNullOrEmpty(clauseNo) ? title : $"{title} {clauseNo}",
                     SourceName = fileName,
-                    Content = pieces[i],
+                    Content = pieces[i].Text,
                     Embedding = vectors[i]
                 });
             }

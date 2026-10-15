@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\XW.Agent\XW.Agent.Application.csproj" />
     <ProjectReference Include="..\XW.Agent.Infrastructure\XW.Agent.Infrastructure.csproj" />
+    <ProjectReference Include="..\XW.Agent.Inspection\XW.Agent.Inspection.csproj" />
   </ItemGroup>
 
   <ItemGroup>
